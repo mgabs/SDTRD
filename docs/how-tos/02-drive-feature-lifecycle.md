@@ -20,7 +20,22 @@ mkdir -p specs/features/01-user-authentication/specs
 
 ---
 
-## Step 2: Gate 1 — Feature Proposal
+## Step 2: Gate 0 — Research & Technical Tradeoffs
+
+1. Copy the research template:
+   ```bash
+   cp specs/templates/research.md specs/features/01-user-authentication/research.md
+   ```
+2. Document:
+   - **Ground Truth**: Verified constraints in existing codebase and docs.
+   - **2–3 Options**: Concrete candidate architectures (e.g. standard library vs minimal custom vs alternative).
+   - **Tradeoff Matrix**: Compare complexity, dependencies, performance, and maintenance burden.
+   - **Recommendation**: Agent's reasoned suggestion.
+3. **Gate 0 Review**: Present options to human developer. The developer explicitly selects the winning path before Gate 1 starts.
+
+---
+
+## Step 3: Gate 1 — Feature Proposal
 
 1. Copy the proposal template:
    ```bash
@@ -28,14 +43,14 @@ mkdir -p specs/features/01-user-authentication/specs
    ```
 2. Fill in:
    - **Intent**: High-level capability summary.
-   - **Scope**: Explicit In-Scope list and Out-of-Scope (YAGNI) list.
+   - **Scope**: Explicit In-Scope list and Out-of-Scope (YAGNI) list based on the chosen Gate 0 option.
    - **Assumptions**: `ASM-GEN-*`.
    - **Success Metrics**: Quantifiable outcomes.
 3. **Gate 1 Review**: Present proposal to human reviewer. Do not proceed until approved.
 
 ---
 
-## Step 3: Gate 2 — Specifications
+## Step 4: Gate 2 — Specifications
 
 1. For each capability, copy the spec template:
    ```bash
@@ -49,7 +64,7 @@ mkdir -p specs/features/01-user-authentication/specs
 
 ---
 
-## Step 4: Gate 3 — Architecture & Design
+## Step 5: Gate 3 — Architecture & Design
 
 1. Copy the design template:
    ```bash
@@ -63,7 +78,7 @@ mkdir -p specs/features/01-user-authentication/specs
 
 ---
 
-## Step 5: Gate 4 — Task Breakdown & Worktree DAG
+## Step 6: Gate 4 — Task Breakdown & Worktree DAG
 
 1. Copy the tasks template:
    ```bash
@@ -74,7 +89,7 @@ mkdir -p specs/features/01-user-authentication/specs
 
 ---
 
-## Step 6: Step 5.x — Vertical Slice Apply Phase
+## Step 7: Step 5.x — Vertical Slice Apply Phase
 
 For each vertical slice:
 
@@ -91,7 +106,7 @@ For each vertical slice:
 
 ---
 
-## Step 7: Gate 6 — Sync & Archive
+## Step 8: Gate 6 — Sync & Archive
 
 1. Run the entire regression suite and mutation suite.
 2. Merge stream worktrees with `--ff-only`.

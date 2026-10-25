@@ -1,31 +1,57 @@
-# Feature Research & Discovery: <Feature Title>
+# Research & Technical Tradeoffs: <Feature Title>
 
-## 1. Intent & Research Goals
-<What critical questions, feasibility risks, or unknowns must be answered before committing to this feature?>
+## 1. Intent & Ground Truth
+<2–3 sentences on the core problem, verified constraints, and facts confirmed via codebase inspection or official documentation.>
 
-## 2. Prior Art & Ecosystem Survey
-<Existing libraries, models, papers, or tools evaluated. What can be reused vs built?>
-- **<Candidate 1>**: <Pros, cons, license, suitability>
-- **<Candidate 2>**: <Pros, cons, license, suitability>
-
-## 3. Empirical Spike & Feasibility
-<Results of prototype experiments, micro-benchmarks, latency checks, memory usage, token pricing, or rate limits.>
-| Candidate / Method | Latency (p50/p95) | Cost / Resource Footprint | Complexity | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| **<Candidate A>** | | | | |
-| **<Candidate B>** | | | | |
-
-## 4. Dataset & Input Nuances
-<Inspection of real-world datasets, class distributions, noise, and edge cases.>
-
-## 5. Alternatives Considered & Trade-Offs
-<Why the recommended approach was selected over alternatives. Key trade-offs accepted.>
-
-## 6. Risks, Failure Modes & Mitigations
-- **<Risk 1>**: <Mitigation>
-- **<Risk 2>**: <Mitigation>
+### Verified Constraints & Prior Art
+- **Existing System Constraints**: <What exists in the codebase today, APIs, data formats, invariants>
+- **Ecosystem / Prior Art**: <How standard tools, libraries, or external systems solve this>
 
 ---
 
-## Review Gate
-- [ ] **Gate 0 Approval**: Research findings reviewed and approved by human before committing to proposal.
+## 2. Options Explored
+
+### Option A: <Short Name, e.g., Standard / Idiomatic Library Path>
+- **Description**: <Brief summary of how this works>
+- **Pros**:
+  - <Pro 1>
+  - <Pro 2>
+- **Cons**:
+  - <Con 1>
+  - <Con 2>
+
+### Option B: <Short Name, e.g., In-House / Zero-Dependency / Minimal Path>
+- **Description**: <Brief summary of how this works>
+- **Pros**:
+  - <Pro 1>
+  - <Pro 2>
+- **Cons**:
+  - <Con 1>
+  - <Con 2>
+
+### Option C: <Short Name, e.g., Alternative / Specialized Architecture> *(Optional)*
+- **Description**: <Brief summary of how this works>
+- **Pros / Cons**: <Brief summary>
+
+---
+
+## 3. Comparative Tradeoff Matrix
+
+| Criteria | Option A (<Name>) | Option B (<Name>) | Option C (<Name>) |
+| :--- | :--- | :--- | :--- |
+| **Complexity** | Low / Med / High | Low / Med / High | Low / Med / High |
+| **New Dependencies** | <e.g., none / 1 crate> | <e.g., none> | <e.g., external service> |
+| **Performance & Latency** | <budget fit> | <budget fit> | <budget fit> |
+| **Maintenance Burden** | Low / Med / High | Low / Med / High | Low / Med / High |
+| **Blast Radius** | Localized / Wide | Localized / Wide | Localized / Wide |
+
+---
+
+## 4. Recommendation & Rationale
+<1–2 sentences recommending the optimal option based on YAGNI, simplicity, and performance constraints.>
+
+---
+
+## Review Gate: Developer Decision
+- [ ] **Chosen Path**: Option A | Option B | Option C
+- [ ] **Developer Sign-off**: Approved by human before opening Gate 1 (Proposal).

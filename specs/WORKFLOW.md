@@ -153,17 +153,16 @@ flowchart TD
     MA & MB --> G6[Gate 6: Spec Sync & Archive]
 ```
 
-### Gate 0: Research & Discovery Review
-- **Mandatory Requirement**: Every feature MUST conduct empirical research and investigate technical trade-offs *before committing to building the feature* or locking in proposals and architectural designs.
+### Gate 0: Research & Tradeoffs Review
+- **Mandatory Requirement**: Every feature MUST conduct brief empirical research and evaluate architectural options *before committing to building the feature* or locking in proposals and designs. This prevents building on opinionated, unverified assumptions.
 - **Artifact**: `specs/features/<feature>/research.md`
 - **Mandatory Sections**:
-  - **Intent & Research Goals**: Core questions and feasibility risks to resolve.
-  - **Prior Art & Ecosystem Survey**: Analysis of existing libraries, models, papers, or internal tools (reusable vs build).
-  - **Empirical Spikes & Feasibility**: Micro-benchmarks, latency measurements, memory usage, pricing models, or API rate limits.
-  - **Dataset & Input Nuances**: Inspection of real-world datasets, class distributions, noise, and edge cases.
-  - **Alternatives Considered & Trade-Offs**: Comparative trade-off matrix of at least 2–3 candidate approaches.
-  - **Risks & Mitigations**: Identified failure modes and architectural bottlenecks.
-- **Gate**: Human approval required before drafting proposal and specifications.
+  - **Intent & Ground Truth**: Core problem, existing system constraints, and facts confirmed via codebase inspection.
+  - **Explored Options (2–3 Paths)**: Brief exploration of concrete candidate paths (e.g. idiomatic library vs minimal zero-dependency in-house vs specialized).
+  - **Comparative Tradeoff Matrix**: Side-by-side evaluation of complexity, dependencies, performance, and maintenance burden.
+  - **Agent Recommendation**: 1–2 sentence recommendation based on YAGNI and system invariants.
+  - **Developer Decision Checkpoint**: Human reviewer explicitly selects the winning path before Gate 1 (Proposal) can be drafted.
+- **Gate**: Human developer decision and approval required before opening Gate 1 (Proposal).
 
 ### Gate 1: Proposal Review
 - **Artifact**: `specs/features/<feature>/proposal.md`

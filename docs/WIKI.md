@@ -34,12 +34,13 @@ SDTRD (Spec-Driven, Testing-Railed Development) is an engineering and AI-agent o
 
 ## 2. Gate Architecture
 
-SDTRD enforces 6 human-in-the-loop gates for features and 3 fast-track gates for defects.
+SDTRD enforces 7 human-in-the-loop gates for features (Gates 0–6) and 3 fast-track gates for defects (Gates B1–B3).
 
 ```mermaid
 flowchart TD
     subgraph Feature_Track [Feature Track]
-        G1[Gate 1: Proposal] --> G2[Gate 2: Specs]
+        G0[Gate 0: Research & Tradeoffs] --> G1[Gate 1: Proposal]
+        G1 --> G2[Gate 2: Specs]
         G2 --> G3[Gate 3: Architecture & Design]
         G3 --> G4[Gate 4: Tasks & Stream DAG]
         G4 --> G5[Gate 5.x: Per-Slice Apply Loop]
@@ -56,6 +57,7 @@ flowchart TD
 
 | Gate | Name | Artifact | Required Content | Next Step |
 | :--- | :--- | :--- | :--- | :--- |
+| **Gate 0** | Research & Tradeoffs | `specs/features/<feat>/research.md` | Ground truth, 2–3 explored options, tradeoff matrix, recommendation, developer decision. | Draft Proposal (Gate 1) |
 | **Gate 1** | Proposal Review | `specs/features/<feat>/proposal.md` | Intent, Problem Statement, Scope (In/Out-of-scope), Success Metrics, Assumptions (`ASM-GEN-*`). | Draft Specifications |
 | **Gate 2** | Specifications Review | `specs/features/<feat>/specs/<cap>/spec.md` | Traceable Requirements (`REQ-*`), Non-Functional Budgets (`NFR-*`), Given/When/Then Scenarios. | Technical Design |
 | **Gate 3** | Architecture Review | `specs/features/<feat>/design.md` | Overview, Domain Contracts, Boundary Rules, Latency/Allocation Budgets, Test Strategy. | Task Breakdown |

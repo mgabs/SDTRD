@@ -69,6 +69,7 @@ sdtrd/
 ├── specs/
 │   └── WORKFLOW.md           # Canonical stack-agnostic SDTRD workflow specification
 ├── templates/
+│   ├── research.md           # Gate 0: Research & Tradeoffs template
 │   ├── proposal.md           # Gate 1: Feature Proposal template
 │   ├── spec.md               # Gate 2: Capability Specification template
 │   ├── design.md             # Gate 3: Architecture & Design template
