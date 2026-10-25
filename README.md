@@ -99,6 +99,7 @@ Scaffolds `specs/{WORKFLOW.md,features/,bug-reports/,living/,templates/}`, sets 
 
 ### Documentation & Guides
 
+- **Engineering Roadmap**: [docs/ROADMAP.md](docs/ROADMAP.md)
 - **Architecture & Methodology Wiki**: [docs/WIKI.md](docs/WIKI.md)
 - **Review Harness & Agent Steering**: [github.com/mgabs/lgtm](https://github.com/mgabs/lgtm)
 - **How-To 1**: [Bootstrap a New Project](docs/how-tos/01-bootstrap-new-project.md)
