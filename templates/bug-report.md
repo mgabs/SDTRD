@@ -46,4 +46,4 @@
 - [ ] **Gate B3 (Green Sign-off & Merge)**:
   - [ ] Regression test passing (`Green`) + full suite green.
   - [ ] Docs & Living Specs Updated (if defect was caused by or impacts existing documentation/specs).
-  - [ ] Fast-forward merged (`--ff-only`) into `main` and worktree pruned.
+  - [ ] Fast-forward merged (`--ff-only`) into `main`, worktree removed, branch deleted, and `git worktree prune` executed.

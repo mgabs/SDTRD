@@ -45,10 +45,11 @@ Never merge a branch whose rails were verified only against a stale base.
      - The orchestrating agent dispatches one subagent per stream, scoped to its worktree.
      - **Hard Prohibition**: Subagents **NEVER** self-approve any human gate (0–6, 5.x, B1–B3) or skip ahead into code.
      - **Escalation**: On completing a gate artifact, the subagent halts and reports to the orchestrating agent, which presents the artifact to the human. Clearance flows back only after explicit human approval.
-  6. **Stream Merge Sequence**: First finished stream merges into the feature branch `--ff-only`. Every later stream follows Rule 2 (rebase onto the updated feature branch, re-run unit + slice mutation suite), then merges `--ff-only`. Remove the worktree and delete the stream branch after each merge:
+  6. **Stream Merge Sequence**: First finished stream merges into the feature branch `--ff-only`. Every later stream follows Rule 2 (rebase onto the updated feature branch, re-run unit + slice mutation suite), then merges `--ff-only`. Clean up the worktree completely after each merge:
      ```bash
      git worktree remove .worktrees/<id>-<stream>
      git branch -d feat/<id>/<stream>
+     git worktree prune
      ```
   7. **Shared File Collision Protocol**: When streams touch shared dispatch, routing, or harness files (key matchers, enum routers, status bars, BDD runners), resolve conflicts **strictly additively**: keep both streams' registrations, handlers, and test cases. NEVER drop another stream's registrations or assertions.
 
@@ -207,7 +208,7 @@ flowchart TD
 - Apply the minimal fix (Green), run the full suite, commit test + fix together.
 - **Spec & doc integrity**: If the defect stems from or affects living specs or docs, fix `specs/living/` and docs in the same branch.
 - Human reviews the final diff and test output.
-- Merge per Rule 2, `git worktree remove .worktrees/fix-<slug>`, `git branch -d fix/<slug>`, mark the report `Resolved` with the commit hash, and rebase active feature branches onto `main`.
+- Merge per Rule 2, clean up worktree completely (`git worktree remove .worktrees/fix-<slug>`, `git branch -d fix/<slug>`, `git worktree prune`), mark the report `Resolved` with the commit hash, and rebase active feature branches onto `main`.
 
 ---
 
@@ -260,7 +261,7 @@ SDTRD pairs with [mgabs/lgtm](https://github.com/mgabs/lgtm) as the review cockp
 
 All steps on the feature branch unless stated otherwise:
 
-1. All stream worktrees merged into the feature branch (Rule 3.6) and pruned.
+1. All stream worktrees merged into the feature branch (Rule 3.6), removed, and pruned (`git worktree prune`). Verify `git worktree list` shows only the repository root.
 2. Rebase the feature branch onto `main` (Rule 2).
 3. Full test suite: $100\%$ pass, $\ge 95\%$ line and branch coverage.
 4. Full-project mutation suite: $100\%$ kill score on core logic.

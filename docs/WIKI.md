@@ -96,6 +96,7 @@ When a feature contains orthogonal tasks (decoupled modules, distinct endpoints,
    git merge --ff-only feat/<feat>/stream-a
    git worktree remove .worktrees/<feat>-stream-a
    git branch -d feat/<feat>/stream-a
+   git worktree prune
    ```
 5. **Rebasing**: The same rebase-and-re-verify rule applies to every merge in SDTRD — streams into features, features/fixes/chores into `main`.
 

@@ -84,6 +84,7 @@ cd .worktrees/fix-token-expiry
    ```bash
    git worktree remove .worktrees/fix-token-expiry
    git branch -d fix/token-expiry
+   git worktree prune
    ```
 4. Mark the bug report as `Resolved` in `specs/bug-reports/` with the commit hash.
 5. If active feature streams or worktrees need the fix, rebase them on updated `main`.

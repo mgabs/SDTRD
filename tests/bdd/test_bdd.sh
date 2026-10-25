@@ -231,6 +231,14 @@ git checkout -q main
 git merge -q --ff-only fix/empty-token
 git worktree remove .worktrees/fix-empty-token >/dev/null
 git branch -q -d fix/empty-token
+git worktree prune
+
+WT_COUNT=$(git worktree list | wc -l | tr -d ' ')
+if [ "$WT_COUNT" -eq 1 ]; then
+  step_pass "Worktree removed and pruned cleanly (only root worktree remains)"
+else
+  step_fail "Worktree removed and pruned cleanly" "expected 1 worktree, found $WT_COUNT"
+fi
 
 assert_file "specs/living/contracts/spec.md" "Living spec contains updated bugfix requirement"
 if grep -q "REQ-CONTRACT-2" specs/living/contracts/spec.md; then

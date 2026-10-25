@@ -14,5 +14,6 @@ When working in a repository containing `specs/WORKFLOW.md`:
    - Pre-commit hooks installed; run linters, formatters, and the full suite before every commit. Never `--no-verify`.
    - Inspect `git status` and `git diff` before every commit.
    - Before any merge: rebase onto target, re-verify rails, merge `--ff-only`.
+   - After any worktree merge: immediately remove worktree (`git worktree remove`), delete branch (`git branch -d`), and prune metadata (`git worktree prune`).
    - `specs/ROADMAP.md` changes only on `main` via `chore/roadmap-<id>`.
 5. **LGTM Directive Preemption**: Review directives (`#ref file:line`) in `.lgtm/reviews/` or chat preempt all forward work. Halt `tasks.md`, resolve, verify, then resume.

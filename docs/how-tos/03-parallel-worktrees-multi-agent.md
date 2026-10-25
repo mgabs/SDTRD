@@ -57,10 +57,11 @@ When Stream A completes and passes Gate 5.x:
    ```bash
    git merge --ff-only feat/01/storage
    ```
-3. Remove the completed worktree and delete the stream branch:
+3. Remove the completed worktree, delete stream branch, and prune:
    ```bash
    git worktree remove .worktrees/01-storage
    git branch -d feat/01/storage
+   git worktree prune
    ```
 
 ---

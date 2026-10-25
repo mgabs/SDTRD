@@ -41,7 +41,7 @@ flowchart TD
 
 ## 4. Integration, Rebase & Gate 6 Checklist
 
-- [ ] Merge completed stream worktrees (rebase onto feature branch, re-verify, `git merge --ff-only`) and remove `.worktrees/*`.
+- [ ] Merge completed stream worktrees (rebase onto feature branch, re-verify, `git merge --ff-only`), remove worktrees, and prune (`git worktree prune`). Verify `git worktree list` shows only the repository root.
 - [ ] Full test suite passes with $\ge 95\%$ line and branch coverage.
 - [ ] Full mutation suite achieves $100\%$ kill score on core logic.
 - [ ] Sync delta specs into `specs/living/`.
