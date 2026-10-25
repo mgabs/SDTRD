@@ -1,0 +1,42 @@
+name: SDTRD Rails
+
+on:
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  verify-rails:
+    name: Verify Specs & Testing Rails
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Audit Spec-to-Code Mapping
+        run: |
+          # Check if non-spec, non-doc code files were modified
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          CODE_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E '^(specs/|docs/|\.github/|.*\.md$)' || true)
+          SPEC_CHANGES=$(echo "$CHANGED_FILES" | grep -E '^specs/(features|bug-reports)/' || true)
+
+          if [ -n "$CODE_CHANGES" ] && [ -z "$SPEC_CHANGES" ]; then
+            echo "ERROR: Code modified without corresponding feature spec or bug report in specs/"
+            echo "Modified files:"
+            echo "$CODE_CHANGES"
+            exit 1
+          fi
+          echo "Spec-to-code audit passed."
+
+      - name: Set up Pre-Commit
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files
+
+      - name: Run Test Suite
+        run: |
+          if [ -f Makefile ]; then
+            make test
+          fi

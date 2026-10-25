@@ -12,6 +12,7 @@ mkdir -p "$target/specs/features" "$target/specs/bug-reports" "$target/specs/liv
 cp "$SDTRD_ROOT/specs/WORKFLOW.md" "$target/specs/WORKFLOW.md"
 cp "$SDTRD_ROOT/templates/"*.md "$target/specs/templates/"
 cp "$SDTRD_ROOT/templates/.pre-commit-config.yaml" "$target/specs/templates/.pre-commit-config.yaml"
+cp "$SDTRD_ROOT/templates/sdtrd-ci.yml" "$target/specs/templates/sdtrd-ci.yml"
 
 if [ ! -f "$target/.pre-commit-config.yaml" ]; then
   cp "$SDTRD_ROOT/templates/.pre-commit-config.yaml" "$target/.pre-commit-config.yaml"

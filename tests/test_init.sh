@@ -57,6 +57,7 @@ assert_file_exists "$TMP1/specs/templates/design.md" "design template copied"
 assert_file_exists "$TMP1/specs/templates/tasks.md" "tasks template copied"
 assert_file_exists "$TMP1/specs/templates/bug-report.md" "bug-report template copied"
 assert_file_exists "$TMP1/specs/templates/.pre-commit-config.yaml" ".pre-commit-config.yaml template copied"
+assert_file_exists "$TMP1/specs/templates/sdtrd-ci.yml" "sdtrd-ci.yml template copied"
 assert_file_exists "$TMP1/.pre-commit-config.yaml" ".pre-commit-config.yaml created in root"
 assert_file_exists "$TMP1/.gitignore" ".gitignore created"
 
