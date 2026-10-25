@@ -43,4 +43,7 @@
 ## Review Gates
 - [ ] **Gate B1 (Triage & Root Cause)**: Approved by human before code changes.
 - [ ] **Gate B2 (Red Reproduction)**: Regression test confirmed failing on unmodified code.
-- [ ] **Gate B3 (Green Sign-off & Merge)**: Fix verified, merged `--ff-only` into `main`, worktree pruned.
+- [ ] **Gate B3 (Green Sign-off & Merge)**:
+  - [ ] Regression test passing (`Green`) + full suite green.
+  - [ ] Docs & Living Specs Updated (if defect was caused by or impacts existing documentation/specs).
+  - [ ] Fast-forward merged (`--ff-only`) into `main` and worktree pruned.

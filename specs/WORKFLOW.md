@@ -168,8 +168,11 @@ flowchart TD
   - **Intent & Ground Truth**: Core problem, existing system constraints, and facts confirmed via codebase inspection.
   - **Explored Options (2–3 Paths)**: Brief exploration of concrete candidate paths (e.g. idiomatic library vs minimal zero-dependency in-house vs specialized).
   - **Comparative Tradeoff Matrix**: Side-by-side evaluation of complexity, dependencies, performance, and maintenance burden.
+  - **Breaking Changes & Deprecations**: Explicit audit identifying any existing `REQ-*` or `NFR-*` keys in `specs/living/` that will be modified, superseded, or deprecated.
   - **Agent Recommendation**: 1–2 sentence recommendation based on YAGNI and system invariants.
-  - **Developer Decision Checkpoint**: Human reviewer explicitly selects the winning path before Gate 1 (Proposal) can be drafted.
+  - **Developer Decision Checkpoint**:
+    - **Go (Option Selected)**: Human selects the winning path $\rightarrow$ Proceed to Gate 1 (Proposal).
+    - **No-Go (Dropped)**: If research reveals the feature is unfeasible or rejected $\rightarrow$ Archive `research.md` to `specs/archive/<feature>/`, record `❌ Dropped` in `specs/ROADMAP.md` with rationale to preserve institutional memory, and prune the feature branch.
 - **Gate**: Human developer decision and approval required before opening Gate 1 (Proposal).
 
 ### Gate 1: Proposal Review
@@ -236,6 +239,7 @@ flowchart TD
 
 ### Gate B3: Integration Sign-off
 - Apply minimal surgical fix (`Green`) and run full regression suite.
+- **Spec & Doc Integrity Check**: If the defect was caused by or impacts existing documentation or living specifications, update `specs/living/` and docs in the same PR/commit to eliminate spec drift.
 - Human inspects final diff and test output.
 - Fast-forward merge into `main`, prune worktree, mark bug report `Resolved` with commit hash, and rebase active feature branches.
 

@@ -52,6 +52,17 @@
 
 ---
 
+## 5. Breaking Changes & Deprecations
+- **Affected Living Requirements**:
+  - `REQ-<DOMAIN>-<ID>`: <Explain whether this requirement is modified, superseded, or deprecated by the proposed options>
+  - `NFR-<DOMAIN>-<ID>`: <Any budget change or obsolete invariant>
+- **Zero Breaking Changes**: *(Check if none)*
+  - [ ] This capability introduces strictly additive behavior with zero modifications to existing living specs.
+
+---
+
 ## Review Gate: Developer Decision
-- [ ] **Chosen Path**: Option A | Option B | Option C
-- [ ] **Developer Sign-off**: Approved by human before opening Gate 1 (Proposal).
+- [ ] **Decision**:
+  - **Go**: Proceed with Option A | Option B | Option C $\rightarrow$ Open Gate 1 (Proposal)
+  - **No-Go**: Reject all options $\rightarrow$ Archive `research.md` to `specs/archive/<id>-<name>/`, record `❌ Dropped` in `specs/ROADMAP.md` with rationale, and prune feature branch.
+- [ ] **Developer Sign-off**: Approved by human.
