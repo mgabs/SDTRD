@@ -1,105 +1,71 @@
 # Spec-Driven, Testing-Railed Development (SDTRD) Workflow
 
-## 1. Branching & Worktree Strategy
+## 1. Lanes, Branching & Worktrees
 
-### Rule 1: Always Use a New Feature Branch
-- **NEVER** work directly on `main` / `master`.
-- Every `specs/` feature proposal MUST originate on a dedicated feature branch:
-  ```bash
-  rtk git checkout -b feat/<feature-id>-<feature-name>
-  ```
-- All research, proposal, specs, design, tasks, and vertical-slice work commits to this feature branch.
+### Rule 0: Pick the Right Lane
 
-### Rule 2: Multi-Agent Parallel Streams via Git Worktrees
-- When tasks/slices have **no mutual dependencies** (orthogonal modules, distinct capabilities, or decoupled tests):
-  1. **Pre-Requisite Contract Lock**: Any shared domain models, interfaces, or contracts (e.g., core types, traits, or domain contracts) MUST be implemented, tested, and committed to the parent feature branch *before* spawning parallel worktrees.
-  2. **Worktree Hygiene & Git Config Guard (`core.bare` Trap)**:
-     - Ensure `.worktrees/` is present in root `.gitignore`.
-     - Check for and clean any stale `.git/index.lock` prior to worktree operations:
-       ```bash
-       rtk rm -f .git/index.lock
-       ```
-     - **Shared Config Invariant**: Git commands inside worktrees MUST NEVER mutate shared repository config. Explicitly guard against worktree operations setting `bare = true` on the parent repository:
-       ```bash
-       rtk git config core.bare false
-       ```
+Every change travels through exactly one lane. Pick it before touching anything.
+
+| Lane | Branch | Use When | Gates |
+| :--- | :--- | :--- | :--- |
+| **Feature** | `feat/<id>-<slug>` | New or changed behavior | 0 → 6 (§2, §4, §6) |
+| **Bugfix** | `fix/<slug>` | Merged behavior contradicts spec, docs, or user intent | B1 → B3 (§3) |
+| **Chore** | `chore/<slug>` | Zero behavior change: docs, formatting, tooling/CI config, refactors that keep every existing test unchanged | None (Rule 5) |
+
+- `<id>` is the work item ID from `specs/ROADMAP.md`, lowercased (e.g., roadmap `W1.2` → `feat/w1.2-data-ingestion`, `specs/features/w1.2-data-ingestion/`).
+- If a chore turns out to change behavior, stop and restart in the Feature or Bugfix lane.
+
+### Rule 1: Never Commit on `main`
+- **NEVER** commit directly to `main` / `master`. Every commit lands through a lane branch merged with `--ff-only`.
+- All research, proposal, specs, design, tasks, and slice work commits to the feature branch.
+
+### Rule 2: Rebase & Re-Verify Before Every Merge
+`--ff-only` fails when the target moved. Before merging any branch (feature, fix, chore, or stream) into its target:
+```bash
+git rebase <target-branch>
+# Re-run pre-commit + full test suite (+ mutation suite where the lane requires it) on the rebased branch
+git checkout <target-branch>
+git merge --ff-only <branch>
+```
+Never merge a branch whose rails were verified only against a stale base.
+
+### Rule 3: Multi-Agent Parallel Streams via Git Worktrees
+- When slices have **no mutual dependencies** (orthogonal modules, distinct capabilities, decoupled tests):
+  1. **Contract Lock**: Shared domain types, interfaces, or contracts MUST be implemented, tested, and committed to the feature branch *before* spawning parallel worktrees.
+  2. **Worktree Hygiene**:
+     - `.worktrees/` MUST be in root `.gitignore`.
+     - **Stale lock safety**: If git reports `.git/index.lock` exists, first verify no git process is running (`pgrep -fl git`). Remove the lock only when none is running. Never delete a lock while another agent may be mid-operation; doing so can corrupt the index.
+     - **Shared config invariant**: Worktree operations MUST NEVER mutate shared repository config. If `core.bare` was flipped to `true`, restore it with `git config core.bare false`.
   3. **Spawn Isolated Worktree**:
      ```bash
-     rtk git worktree add .worktrees/<feature-id>-<stream-name> -b feat/<feature-id>/<stream-name>
+     git worktree add .worktrees/<id>-<stream> -b feat/<id>/<stream>
      ```
-  4. **Environment & Path Resolution**:
-     - Tests and modules MUST resolve paths relative to the project root or Git repository boundary, avoiding hardcoded parent directory traversal.
-     - Reuse the project's shared build cache and dependencies inside the worktree without reinstallation.
-  5. **Concurrently Dispatched Subagents & Human Gate Escalation**:
-     - Dispatch a dedicated subagent (`invoke_subagent`) per stream, passing the worktree directory.
-     - **Hard Prohibition**: Subagents **NEVER** self-approve human gates (Gates 0, 1, 2, 3, 4, 5.x, 6, B1, B2, B3) or jump ahead into coding autonomously.
-     - **Main-Loop Escalation Protocol**: Upon completing any gate artifact, the subagent MUST pause, send a message to the Lead Orchestrator on the main loop, and halt execution.
-     - **User Clearance**: Lead Orchestrator presents the clickable artifact link to the human user. Clearance is delivered back to the subagent only after explicit human approval in the main conversation.
-     - Each agent executes its vertical slice in isolation:
-       - BDD Scenarios (Gate 5.x escalation)
-       - Unit Tests (Red)
-       - Minimal Implementation (Green)
-       - Coverage ($\ge 95\%$ line & branch)
-       - Targeted Slice Mutation Testing ($100\%$ kill score on slice module)
-  6. **Rebase & Merge Sequence**:
-     - The first completed stream merges into the feature branch via fast-forward:
-       ```bash
-       rtk git checkout feat/<feature-id>-<feature-name>
-       rtk git merge --ff-only feat/<feature-id>/<stream-name>
-       rtk git worktree remove .worktrees/<feature-id>-<stream-name>
-       rtk git branch -d feat/<feature-id>/<stream-name>
-       ```
-     - Subsequent streams MUST rebase onto the updated feature branch and re-verify testing rails before merging:
-       ```bash
-       rtk git -C .worktrees/<feature-id>-<stream-2> rebase feat/<feature-id>-<feature-name>
-       # MUST re-run unit tests and slice mutation tests in worktree post-rebase
-       rtk git checkout feat/<feature-id>-<feature-name>
-       rtk git merge --ff-only feat/<feature-id>/<stream-2>
-       rtk git worktree remove .worktrees/<feature-id>-<stream-2>
-       rtk git branch -d feat/<feature-id>/<stream-2>
-       ```
-  7. **Shared File Collision Protocol**:
-     - When parallel streams touch shared dispatch, routing, or test harness files (e.g., CLI key event matchers, central enum routers, UI status bars, BDD runners):
-     - Merge conflicts MUST be resolved **strictly additively**: combine registrations from both features, preserve handlers from both streams, and keep all test cases intact. NEVER overwrite or drop another stream's registrations or assertions.
-
-### Rule 3: Fast-Track Bugfix Protocol (Zero-Contamination Bug Isolation)
-- **Scope Distinction**:
-  - **In-Flight Slice Defect**: A defect discovered inside the active slice being developed is resolved directly within that slice's branch/worktree via an immediate red-first regression test. No extra triage gates needed.
-  - **Cross-Cutting / Main / Regression Defect**: A defect affecting already-merged modules or discovered during dogfooding MUST follow the full Fast-Track Protocol below.
-- **HARD PROHIBITION**: NEVER modify production code on `main` or within a dirty feature working directory without an isolated worktree and red test.
-- **Protocol Steps**:
-  1. **Log Defect**: File a bug report in `specs/bug-reports/<date>-<slug>.md` detailing root cause, reproduction steps, and expected behavior.
-  2. **Spawn Worktree**: Create an isolated bugfix worktree branching off target base (e.g., `main`):
+  4. **Path Resolution**: Tests and modules MUST resolve paths relative to the project root or Git boundary, never hardcoded parent traversal. Reuse the project's shared build cache and dependencies inside worktrees.
+  5. **Subagent Dispatch & Gate Escalation**:
+     - The orchestrating agent dispatches one subagent per stream, scoped to its worktree.
+     - **Hard Prohibition**: Subagents **NEVER** self-approve any human gate (0–6, 5.x, B1–B3) or skip ahead into code.
+     - **Escalation**: On completing a gate artifact, the subagent halts and reports to the orchestrating agent, which presents the artifact to the human. Clearance flows back only after explicit human approval.
+  6. **Stream Merge Sequence**: First finished stream merges into the feature branch `--ff-only`. Every later stream follows Rule 2 (rebase onto the updated feature branch, re-run unit + slice mutation suite), then merges `--ff-only`. Remove the worktree and delete the stream branch after each merge:
      ```bash
-     rtk git worktree add .worktrees/fix-<bug-slug> -b fix/<bug-slug> main
+     git worktree remove .worktrees/<id>-<stream>
+     git branch -d feat/<id>/<stream>
      ```
-  3. **Mandatory Red-First Regression Test**:
-     - Write a targeted test replicating the defect *before touching any production code*.
-     - Run the test in the worktree: MUST fail (`Red`).
-  4. **Minimal Fix (Green)**:
-     - Apply the minimal surgical fix in the worktree to turn the test passing (`Green`).
-     - Run the full test suite to guarantee zero regressions.
-  5. **Merge & Prune**:
-     - Fast-forward merge the fix into `main`:
-       ```bash
-       rtk git checkout main
-       rtk git merge --ff-only fix/<bug-slug>
-       rtk git worktree remove .worktrees/fix-<bug-slug>
-       rtk git branch -d fix/<bug-slug>
-       ```
-  6. **Rebase Active Feature Branches**:
-     - Rebase active feature branches and worktrees onto updated `main`.
+  7. **Shared File Collision Protocol**: When streams touch shared dispatch, routing, or harness files (key matchers, enum routers, status bars, BDD runners), resolve conflicts **strictly additively**: keep both streams' registrations, handlers, and test cases. NEVER drop another stream's registrations or assertions.
 
-### Rule 4: Mandatory Pre-Commit Hooks & Verification
-- **Always Install Pre-Commit Hooks**:
-  - Every project MUST configure and install pre-commit hooks (`pre-commit install` or repo hooks).
-  - Pre-commit configuration lives in `.pre-commit-config.yaml`.
-- **Pre-Commit Verification Protocol**:
-  - Before staging and committing ANY changes:
-    1. Inspect status and diff: `rtk git status` and `rtk git diff`.
-    2. Run all linters and formatters (e.g., `pre-commit run --all-files` or project equivalent).
-    3. Run all unit and integration tests.
-  - **Zero-Bypass Prohibition**: Bypassing hooks via `git commit --no-verify` or `-n` is strictly forbidden. If a check or test fails, fix the code/test before committing.
+### Rule 4: Pre-Commit Hooks & Red-Commit Policy
+- **Install hooks**: Every project MUST configure `.pre-commit-config.yaml` and run `pre-commit install`.
+- **Before every commit**:
+  1. Inspect `git status` and `git diff`.
+  2. Run all linters and formatters (`pre-commit run --all-files` or equivalent).
+  3. Run the full unit and integration suite.
+- **Zero bypass**: `git commit --no-verify` / `-n` is forbidden. Fix the failure instead.
+- **Red is never committed alone**: Red tests are written and verified failing locally (output shown to the human where a gate requires it), then committed together with the Green implementation that makes them pass. The tip of every branch is always green.
+
+### Rule 5: Chore Lane
+1. `git checkout -b chore/<slug>` from the target branch.
+2. Make the change. Refactors MUST keep every existing test unchanged and green; touched core modules MUST keep a 100% mutation kill score.
+3. Commit through pre-commit (Rule 4).
+4. Merge per Rule 2, then delete the branch.
 
 ---
 
@@ -108,202 +74,209 @@
 ### Canonical Directory Layout
 ```text
 specs/
-├── WORKFLOW.md     <-- Operating procedures and human review gate rails
-├── ROADMAP.md      <-- Project-level waves, backlog, dependency spine, and exit criteria
-├── features/       <-- Active in-progress feature development (research, proposals, designs, tasks, specs)
-├── living/         <-- Canonical living specifications of shipped capabilities
-├── archive/        <-- Archived lifecycle artifacts of merged features
-├── bug-reports/    <-- Documented defect triage reports
-└── templates/      <-- Reusable lifecycle markdown artifacts
+├── WORKFLOW.md     <-- Operating procedures and gate rails
+├── ROADMAP.md      <-- Waves, work items, dependency spine, exit criteria
+├── features/       <-- Active features: research, proposal, design, tasks, specs
+├── living/         <-- Canonical specs of shipped capabilities (ground truth)
+├── archive/        <-- Lifecycle artifacts of shipped or dropped features
+├── bug-reports/    <-- Defect triage reports
+└── templates/      <-- Lifecycle markdown templates
 ```
+
+### Gate Approval Evidence
+A gate passes only when the agent, after explicit human approval, ticks the artifact's **Review Gate** checkbox and commits it. An unticked box means the gate has not passed, whatever was said in chat.
+
+### ROADMAP.md Updates (Main-Only via Chore Lane)
+`specs/ROADMAP.md` is never edited on feature branches; that avoids conflicts between parallel features and keeps status visible on `main`. Status changes land through a tiny `chore/roadmap-<id>` branch merged per Rule 2:
+
+| Moment | Status Change |
+| :--- | :--- |
+| Gate 0 start | `⬜` → `🔬 In Research` |
+| Gate 0 decision: Go | `🔬` → `🚀 In Progress` |
+| Gate 0 decision: No-Go | `🔬` → `❌ Dropped` + rationale; also commits `research.md` to `specs/archive/<id>-<slug>/` |
+| Gate 6 end (after feature merge) | `🚀` → `✅ Shipped` |
 
 ```mermaid
 flowchart TD
-    RD[specs/ROADMAP.md: Select Work Item] --> B0[Checkout feat/branch]
-    B0 --> G0[Gate 0: Research & Tradeoffs Review]
+    RD["ROADMAP.md: pick item, mark 🔬 (chore)"] --> B0[Checkout feat/id-slug]
+    B0 --> G0[Gate 0: Research & Tradeoffs]
     G0 --> Dec0{Developer Decision}
 
-    Dec0 -- Go: Option Selected --> G1[Gate 1: Proposal Review]
-    Dec0 -- No-Go: Dropped --> Drop[Mark ❌ Dropped in ROADMAP.md & Prune Branch]
+    Dec0 -- Go --> Go["Mark 🚀 (chore)"]
+    Go --> G1[Gate 1: Proposal]
+    Dec0 -- No-Go --> Drop["Archive research.md + mark ❌ (chore), delete feat branch"]
 
-    G1 --> G2[Gate 2: Specs Review]
-    G2 --> G3[Gate 3: Architecture & Design Review]
-    G3 --> G4[Gate 4: Tasks Breakdown Review]
+    G1 --> G2[Gate 2: Specs]
+    G2 --> G3[Gate 3: Architecture & Design]
+    G3 --> G4[Gate 4: Tasks & DAG]
     G4 --> DAG{Analyze Task DAG}
 
-    DAG -- Independent Streams --> S_A[Agent Stream A: Worktree A]
-    DAG -- Independent Streams --> S_B[Agent Stream B: Worktree B]
-    DAG -- Sequential / Dependent --> S_Seq[Sequential Slice Execution]
+    DAG -- Independent --> S_A[Stream A: Worktree A]
+    DAG -- Independent --> S_B[Stream B: Worktree B]
+    DAG -- Dependent --> S_Seq[Sequential Slices]
 
-    subgraph StreamA_Loop [Stream A: Vertical Slice]
-        A1[BDD Scenarios] --> GA[Gate 5.A Review]
+    subgraph Slice_Loop [Gate 5.x: Vertical Slice Loop]
+        A1[BDD Scenarios] --> GA[Gate 5.x Review]
         GA --> A2[Unit Tests Red]
-        A2 --> A3[Implement Green]
+        A2 --> A3[Implement Green + Commit]
         A3 --> A4[Coverage >= 95%]
         A4 --> A5[Mutation 100% Kill]
     end
 
-    subgraph StreamB_Loop [Stream B: Vertical Slice]
-        B1[BDD Scenarios] --> GB[Gate 5.B Review]
-        GB --> B2[Unit Tests Red]
-        B2 --> B3[Implement Green]
-        B3 --> B4[Coverage >= 95%]
-        B4 --> B5[Mutation 100% Kill]
-    end
+    S_A --> Slice_Loop
+    S_B --> Slice_Loop
+    S_Seq --> Slice_Loop
 
-    S_A --> StreamA_Loop
-    S_B --> StreamB_Loop
-    S_Seq --> StreamA_Loop
-
-    StreamA_Loop --> MA[Merge Worktree A --ff-only]
-    StreamB_Loop --> MB[Rebase & Merge Worktree B]
-
-    MA & MB --> G6[Gate 6: Spec Sync & Archive]
-    G6 --> UpdRD[Mark ✅ Shipped in ROADMAP.md]
+    Slice_Loop --> MS["Rebase, re-verify, merge streams --ff-only"]
+    MS --> G6[Gate 6: Spec Sync, Archive, Rebase on main, Merge]
+    G6 --> Ship["Mark ✅ (chore)"]
 ```
 
-### Gate 0: Research & Tradeoffs Review
-- **Mandatory Requirement**: Every feature MUST conduct brief empirical research and evaluate architectural options *before committing to building the feature* or locking in proposals and designs. This prevents building on opinionated, unverified assumptions.
-- **Artifact**: `specs/features/<feature>/research.md`
+### Gate 0: Research & Tradeoffs
+- **Purpose**: Explore briefly and let the developer decide *before* committing to build, so nothing gets built on opinionated, unverified assumptions.
+- **Artifact**: `specs/features/<id>-<slug>/research.md`
 - **Mandatory Sections**:
-  - **Intent & Ground Truth**: Core problem, existing system constraints, and facts confirmed via codebase inspection.
-  - **Explored Options (2–3 Paths)**: Brief exploration of concrete candidate paths (e.g. idiomatic library vs minimal zero-dependency in-house vs specialized).
-  - **Comparative Tradeoff Matrix**: Side-by-side evaluation of complexity, dependencies, performance, and maintenance burden.
-  - **Breaking Changes & Deprecations**: Explicit audit identifying any existing `REQ-*` or `NFR-*` keys in `specs/living/` that will be modified, superseded, or deprecated.
-  - **Agent Recommendation**: 1–2 sentence recommendation based on YAGNI and system invariants.
-  - **Developer Decision Checkpoint**:
-    - **Go (Option Selected)**: Human selects the winning path $\rightarrow$ Proceed to Gate 1 (Proposal).
-    - **No-Go (Dropped)**: If research reveals the feature is unfeasible or rejected $\rightarrow$ Archive `research.md` to `specs/archive/<feature>/`, record `❌ Dropped` in `specs/ROADMAP.md` with rationale to preserve institutional memory, and prune the feature branch.
-- **Gate**: Human developer decision and approval required before opening Gate 1 (Proposal).
+  - **Intent & Ground Truth**: Problem, existing constraints, facts verified in the codebase or official docs.
+  - **Explored Options (2–3)**: e.g., idiomatic library vs minimal in-house vs specialized.
+  - **Tradeoff Matrix**: Complexity, dependencies, performance, maintenance, blast radius.
+  - **Breaking Changes & Deprecations**: Every `REQ-*` / `NFR-*` in `specs/living/` that will be modified, superseded, or deprecated.
+  - **Recommendation**: 1–2 sentences, YAGNI-first.
+- **Gate**: Developer decides **Go** (option chosen → Gate 1) or **No-Go** (archive research to `main` via chore, mark `❌`, delete the feature branch).
 
-### Gate 1: Proposal Review
-- **Artifact**: `specs/features/<feature>/proposal.md`
-- **Mandatory Sections**: Intent, Problem Statement, Scope (In-Scope / Out-of-Scope YAGNI), Success Metrics, Assumptions (`ASM-GEN-*`).
-- **Gate**: Human approval required before drafting specs.
+### Gate 1: Proposal
+- **Artifact**: `specs/features/<id>-<slug>/proposal.md`
+- **Mandatory Sections**: Intent, Problem Statement, Scope (In-Scope / Out-of-Scope YAGNI), Success Metrics, Assumptions (`ASM-GEN-*`), built on the option chosen at Gate 0.
+- **Gate**: Human approval before drafting specs.
 
-### Gate 2: Specifications Review
-- **Artifacts**: `specs/features/<feature>/specs/<capability>/spec.md`
-- **Mandatory Sections**: Functional Requirements (`REQ-*`), Non-Functional Requirements & Performance Budgets (`NFR-*`), Assumptions (`ASM-*`), Edge Cases & Error Conditions, Behavioral Scenarios (`Given / When / Then`).
-- **Traceability**: Every requirement MUST be uniquely keyed (`REQ-<DOMAIN>-<ID>`, `NFR-<DOMAIN>-<ID>`).
-- **Gate**: Human approval required before technical design.
+### Gate 2: Specifications
+- **Artifacts**: `specs/features/<id>-<slug>/specs/<capability>/spec.md`
+- **Full-Copy Rule**: Feature specs are **complete** capability specs, never partial deltas.
+  - **Existing capability**: First copy `specs/living/<capability>/spec.md` into the feature dir, then edit it in place. Deprecated keys stay, marked `[DEPRECATED by <id>]`; keys are never reused.
+  - **New capability**: New file.
+  - This makes Gate 6 sync a safe overwrite.
+- **Mandatory Sections**: Functional Requirements (`REQ-*`), Non-Functional Requirements & Budgets (`NFR-*`), Assumptions (`ASM-*`), Edge Cases & Errors, Behavioral Scenarios (`Given / When / Then`).
+- **Traceability**: Every requirement uniquely keyed (`REQ-<DOMAIN>-<N>`, `NFR-<DOMAIN>-<N>`).
+- **Gate**: Human approval before technical design.
 
-### Gate 3: Architecture & Design Review
-- **Artifact**: `specs/features/<feature>/design.md`
-- **Mandatory Sections**:
-  - Architectural Overview & Invariants
-  - Domain Models, State & Interface Contracts
-  - Architecture Diagrams & Data Flow
-  - Boundary Rules (Pure Core vs I/O Shell)
-  - Concurrency, Latency & Resource Budgets (matching `NFR-*` specs)
-  - Testing Strategy
+### Gate 3: Architecture & Design
+- **Artifact**: `specs/features/<id>-<slug>/design.md`
+- **Mandatory Sections**: Overview & Invariants; Domain Models, State & Interface Contracts; Architecture Diagrams & Data Flow; Boundary Rules (Pure Core vs I/O Shell); Concurrency, Latency & Resource Budgets (matching `NFR-*`); Testing Strategy.
 - **Domain-Specific Baselines**:
-  - **UI / Interactive Systems**: Define render frame deadlines (e.g., $< 16\text{ms}$), input latency budgets, and background I/O offloading rules.
-  - **ML / Data / Heuristics**: Mandate a deterministic Tier 0 Dumb Baseline before complex models or external APIs.
-- **Gate**: Human approval required before task breakdown.
+  - **UI / Interactive**: Frame deadlines (e.g., $< 16\text{ms}$), input latency budgets, background I/O offloading.
+  - **ML / Data / Heuristics**: Deterministic Tier 0 baseline before complex models or external APIs.
+- **Gate**: Human approval before task breakdown.
 
-### Gate 4: Tasks Breakdown Review
-- **Artifact**: `specs/features/<feature>/tasks.md`
-- **Mandatory Sections**:
-  - **Dependency DAG**: Explicit mapping of slice prerequisites.
-  - **Multi-Agent Streams**: Orthogonal slices partitioned into streams (`Stream A`, `Stream B`, etc.) with designated Git worktrees (`.worktrees/<feature>-<stream>`).
-  - **Order of Execution**: Test-first vertical slice steps per stream (BDD $\rightarrow$ Gate 5.x $\rightarrow$ Unit Red $\rightarrow$ Code Green $\rightarrow$ Coverage $\rightarrow$ Mutation).
-  - **Integration & Rebase Plan**: Merge sequence and synchronization checkpoints across streams.
-- **Gate**: Human approval required before spawning worktrees or writing test code.
+### Gate 4: Tasks & DAG
+- **Artifact**: `specs/features/<id>-<slug>/tasks.md`
+- **Mandatory Sections**: Dependency DAG; Streams with worktrees (`.worktrees/<id>-<stream>`); test-first order per slice (BDD → Gate 5.x → Red → Green → Coverage → Mutation); Integration & Rebase Plan.
+- **Gate**: Human approval before spawning worktrees or writing tests.
 
 ---
 
-## 3. Bug Lifecycle & Fast-Track Gates
+## 3. Bugfix Lane & Fast-Track Gates
+
+- **Scope**:
+  - **In-flight slice defect** (inside the slice being built): fix in that slice's branch with an immediate Red-first test. No extra gates.
+  - **Merged / cross-cutting / dogfood defect**: full lane below.
+- **Hard Prohibition**: Never touch production code on `main` or in a dirty feature directory.
 
 ```mermaid
 flowchart TD
-    BR[Bug Encountered / Dogfood Failure] --> GB1[Gate B1: Bug Report & Triage]
-    GB1 --> WT[Spawn .worktrees/fix-slug]
-    WT --> T_Red[Write Regression Test: Red]
+    BR[Defect Found] --> GB1[Gate B1: Bug Report & Triage]
+    GB1 --> WT[Spawn .worktrees/fix-slug off main]
+    WT --> T_Red["Regression Test: Red (uncommitted)"]
     T_Red --> GB2[Gate B2: Reproduction Confirmed]
-    GB2 --> C_Green[Minimal Fix: Green]
-    C_Green --> V_Suite[Full Regression Suite Passes]
-    V_Suite --> GB3[Gate B3: Integration Sign-off]
-    GB3 --> Merge[Merge --ff-only & Prune Worktree]
-    Merge --> Rebase[Rebase Active Feature Streams]
+    GB2 --> C_Green[Minimal Fix: Green + Commit]
+    C_Green --> GB3[Gate B3: Sign-off]
+    GB3 --> Merge["Rebase on main, re-verify, merge --ff-only, prune"]
+    Merge --> Rebase[Rebase Active Feature Branches]
 ```
 
 ### Gate B1: Bug Report & Triage
 - **Artifact**: `specs/bug-reports/<date>-<slug>.md`
-- **Mandatory Sections**: Status & Metadata, Summary, Steps to Reproduce, Expected vs Actual Result, Root Cause Analysis, Remediation Plan.
-- **Gate**: Human approval required before code execution.
+- **Mandatory Sections**: Status & Metadata, Summary, Steps to Reproduce, Expected vs Actual, Root Cause Analysis, Remediation Plan.
+- **Gate**: Human approval before code changes.
 
 ### Gate B2: Reproduction Confirmed (Red-First)
-- Spawn isolated worktree off target branch (`rtk git worktree add .worktrees/fix-<slug> -b fix/<slug> main`).
-- Write targeted regression test replicating the defect *before touching any production code*.
-- Test MUST fail (`Red`) on unmodified code.
-- **Gate**: Human verifies the failing test reproduces the real defect.
+- `git worktree add .worktrees/fix-<slug> -b fix/<slug> main`
+- Write the regression test *before touching production code*. It MUST fail on unmodified code.
+- Show the failing output to the human. The Red test stays uncommitted (Rule 4).
+- **Gate**: Human confirms the test reproduces the real defect.
 
-### Gate B3: Integration Sign-off
-- Apply minimal surgical fix (`Green`) and run full regression suite.
-- **Spec & Doc Integrity Check**: If the defect was caused by or impacts existing documentation or living specifications, update `specs/living/` and docs in the same PR/commit to eliminate spec drift.
-- Human inspects final diff and test output.
-- Fast-forward merge into `main`, prune worktree, mark bug report `Resolved` with commit hash, and rebase active feature branches.
-
----
-
-## 4. Apply Phase: Vertical-Slice Test-Driven Implementation
-
-Execute each vertical slice through three strict sub-steps:
-
-### Step 5.x-A: BDD Behavior Scenarios (100% Behavior Coverage)
-- Write Gherkin feature scenarios (`tests/bdd/features/*.feature` or stack equivalent) covering all `REQ-*`, `NFR-*`, and boundary conditions.
-- **Gate 5.x Presentation**: Present scenarios to human in ultra-compact bullet format (scenario title, key assertions, boundary checks). Wait for explicit confirmation before writing tests.
-
-### Step 5.x-B: Unit Tests & Red-Green-Refactor ($\ge 95\%$ Coverage)
-- **Red**: Write failing unit tests first. Verify test failure for the expected reason.
-- **Green**: Implement minimal production code to make tests pass (strictly YAGNI).
-- **Refactor**: Clean up duplication and structure under green test protection.
-- **Coverage**: Enforce line and branch coverage $\ge 95\%$ on the target module.
-- **Performance Verification**: Verify any `NFR-*` latency or allocation budgets with deterministic benchmarks/assertions.
-
-### Step 5.x-C: Mutation Testing (100% Kill Score)
-- **Scoped Run**: Scope mutation runner strictly to the active slice module (e.g., targeting only modified slice files) to avoid re-mutating completed slices. Full codebase mutation run is reserved for Gate 6.
-- **Surviving Mutant Protocol**: Every surviving mutant is a blocking defect. Resolve by:
-  1. Adding a targeted test assertion that kills the mutant, OR
-  2. Deleting redundant/unreachable code (Ponytail / YAGNI rule). If a mutant survives on an unreachable defensive assertion or branch, delete the redundant code; never mask surviving mutants with skip directives.
-- **Target**: $100\%$ mutation kill rate on slice domain and core logic.
+### Gate B3: Sign-off & Merge
+- Apply the minimal fix (Green), run the full suite, commit test + fix together.
+- **Spec & doc integrity**: If the defect stems from or affects living specs or docs, fix `specs/living/` and docs in the same branch.
+- Human reviews the final diff and test output.
+- Merge per Rule 2, `git worktree remove .worktrees/fix-<slug>`, `git branch -d fix/<slug>`, mark the report `Resolved` with the commit hash, and rebase active feature branches onto `main`.
 
 ---
 
-## 5. Coding Agents & Review Harness Integration
+## 4. Gate 5.x: Vertical-Slice Apply Loop
 
-SDTRD integrates natively with [mgabs/lgtm](https://github.com/mgabs/lgtm) as the real-time code review cockpit and agent steering harness:
+`x` = slice number from `tasks.md`. Each slice runs three strict steps:
 
-- **Directive Preemption Invariant**: Review directives (`#ref file:line`) preempt all forward progress. When incoming review directives exist in `.lgtm/reviews/` or user chat, the agent MUST halt active `tasks.md` execution and resolve all review directives to clean verification before resuming any forward tasks.
-- **Anchor Directives**: Honor line-anchored feedback directives (`#ref file:line <directive>`) emitted by `lgtm`. Acknowledge directive, resolve at exact target line, verify test pass, and commit.
-- **Review Inbox**: Check `.lgtm/reviews/` and inline user directives on every turn; resolve review items before advancing gates.
-- **Pre-Commit Verification**: Run all linters, formatting checks, and test suites prior to committing. Never bypass hooks with `--no-verify`.
-- **Test Integrity (Anti-Fraud Guardrails)**:
-  - NEVER delete assertions or weaken tests to force a green suite (`lgtm` test neutering guard will block review).
+### Step 5.x-A: BDD Scenarios (100% Behavior Coverage)
+- Write Gherkin scenarios (`tests/bdd/features/*.feature` or stack equivalent) covering all `REQ-*`, `NFR-*`, and boundaries.
+- **Gate 5.x**: Present in ultra-compact bullets (title, key assertions, boundaries). Wait for explicit approval before writing tests.
+
+### Step 5.x-B: Red → Green → Refactor ($\ge 95\%$ Coverage)
+- **Red**: Write failing unit tests; verify they fail for the expected reason. Do not commit yet (Rule 4).
+- **Green**: Minimal production code to pass (strict YAGNI). Commit tests + code together.
+- **Refactor**: Under green protection.
+- **Coverage**: Line and branch $\ge 95\%$ on the target module.
+- **Performance**: Verify `NFR-*` budgets with deterministic benchmarks/assertions.
+
+### Step 5.x-C: Mutation Testing (100% Kill, No Exemptions)
+- **Scoped run**: Mutate only the slice's modules. Full-project mutation runs at Gate 6.
+- **Every surviving mutant is a blocking defect**. Resolve by exactly one of:
+  1. **Add a targeted assertion** that kills it.
+  2. **Delete dead code**: unreachable defensive branches or assertions get removed (YAGNI).
+  3. **Restructure equivalent mutants away**: when a mutant is behaviorally identical to the original (e.g., `i < n` → `i != n` in an index loop), rewrite the code so the equivalence disappears (iterators instead of index loops, removing redundant conditions), making the mutant killable or impossible.
+- Never mask survivors with skip comments, exclusion lists, or lowered thresholds.
+- **Target**: $100\%$ kill score on slice domain and core logic.
+
+---
+
+## 5. Coding Agents & Review Harness
+
+SDTRD pairs with [mgabs/lgtm](https://github.com/mgabs/lgtm) as the review cockpit and agent steering harness.
+
+- **Directive Preemption**: Review directives (`#ref file:line <directive>`) preempt all forward work. When directives exist in `.lgtm/reviews/` or chat, halt `tasks.md` execution, resolve every directive to clean verification, then resume.
+- **Anchor Directives**: Resolve at the exact target line, verify tests pass, commit (Rule 4).
+- **Review Inbox**: Check `.lgtm/reviews/` and inline directives every turn.
+- **Test Integrity (Anti-Fraud)**:
+  - NEVER delete or weaken assertions to force green (`lgtm`'s test-neutering guard will flag it).
   - NEVER write vacuous assertions or tautological mocks.
   - NEVER skip/ignore failing tests without explicit human sign-off.
-- **Architecture Boundaries & Hygiene**:
-  - Keep domain core pure (zero direct I/O, network, or framework coupling).
-  - Restrict file modifications strictly to the active vertical slice (minimal blast radius).
-  - YAGNI enforcement: Zero dead unreferenced code added.
-  - Leave zero scratch files, debug dumps, or `.env` artifacts in the working tree.
+- **Boundaries & Hygiene**:
+  - Pure domain core: no direct I/O, network, or framework coupling.
+  - Touch only files in the active slice (minimal blast radius).
+  - No dead or unreferenced code (YAGNI).
+  - No scratch files, debug dumps, or `.env` artifacts in the tree.
 
 ---
 
 ## 6. Gate 6: Living Spec Sync, Archive & Merge
 
-1. Run the full test suite and verify $100\%$ pass rate + $\ge 95\%$ line and branch coverage.
-2. Run the full mutation suite across the entire project and verify $100\%$ kill score on core logic.
-3. Ensure all parallel stream worktrees are merged (`--ff-only`) into the feature branch and pruned.
-4. Sync feature delta specs (`specs/features/<feature>/specs/`) into the canonical living specifications directory (`specs/living/`).
-5. Check off all items in `specs/features/<feature>/tasks.md` and record Gate 6 completion.
-6. Move feature lifecycle artifacts (`research.md`, `proposal.md`, `design.md`, `tasks.md`) to `specs/archive/<feature>/`:
+All steps on the feature branch unless stated otherwise:
+
+1. All stream worktrees merged into the feature branch (Rule 3.6) and pruned.
+2. Rebase the feature branch onto `main` (Rule 2).
+3. Full test suite: $100\%$ pass, $\ge 95\%$ line and branch coverage.
+4. Full-project mutation suite: $100\%$ kill score on core logic.
+5. Sync specs (safe overwrite, per the Gate 2 full-copy rule):
    ```bash
-   rtk git mv specs/features/<feature> specs/archive/<feature>
+   cp -R specs/features/<id>-<slug>/specs/. specs/living/
    ```
-7. Fast-forward merge feature branch into `main`:
+6. Tick every item in `tasks.md` and the Gate 6 box.
+7. Archive the lifecycle artifacts:
    ```bash
-   rtk git checkout main
-   rtk git merge --ff-only feat/<feature-id>-<feature-name>
+   git mv specs/features/<id>-<slug> specs/archive/<id>-<slug>
    ```
-8. Update `specs/ROADMAP.md` work item status to `✅ Shipped`.
+8. Commit, then merge into `main`:
+   ```bash
+   git checkout main
+   git merge --ff-only feat/<id>-<slug>
+   git branch -d feat/<id>-<slug>
+   ```
+9. Mark `✅ Shipped` in `specs/ROADMAP.md` via `chore/roadmap-<id>` (§2).

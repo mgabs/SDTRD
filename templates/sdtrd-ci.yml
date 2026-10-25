@@ -16,11 +16,17 @@ jobs:
           fetch-depth: 0
 
       - name: Audit Spec-to-Code Mapping
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          # Check if non-spec, non-doc code files were modified
+          # Chore lane (zero behavior change) is exempt from spec mapping; rails below still apply.
+          case "$HEAD_REF" in
+            chore/*) echo "Chore lane: spec-to-code audit skipped."; exit 0 ;;
+          esac
+
           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
           CODE_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E '^(specs/|docs/|\.github/|.*\.md$)' || true)
-          SPEC_CHANGES=$(echo "$CHANGED_FILES" | grep -E '^specs/(features|bug-reports)/' || true)
+          SPEC_CHANGES=$(echo "$CHANGED_FILES" | grep -E '^specs/(features|archive|living|bug-reports)/' || true)
 
           if [ -n "$CODE_CHANGES" ] && [ -z "$SPEC_CHANGES" ]; then
             echo "ERROR: Code modified without corresponding feature spec or bug report in specs/"

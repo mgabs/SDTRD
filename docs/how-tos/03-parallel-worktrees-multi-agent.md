@@ -24,14 +24,14 @@ flowchart TD
 Ensure your base feature branch is committed and up to date:
 
 ```bash
-rtk git checkout feat/01-data-pipeline
+git checkout feat/01-data-pipeline
 ```
 
 Spawn isolated worktrees:
 
 ```bash
-rtk git worktree add .worktrees/01-storage -b feat/01/storage
-rtk git worktree add .worktrees/01-api -b feat/01/api
+git worktree add .worktrees/01-storage -b feat/01/storage
+git worktree add .worktrees/01-api -b feat/01/api
 ```
 
 ---
@@ -51,16 +51,16 @@ When Stream A completes and passes Gate 5.x:
 
 1. Checkout the feature branch:
    ```bash
-   rtk git checkout feat/01-data-pipeline
+   git checkout feat/01-data-pipeline
    ```
 2. Fast-forward merge the stream:
    ```bash
-   rtk git merge --ff-only feat/01/storage
+   git merge --ff-only feat/01/storage
    ```
 3. Remove the completed worktree and delete the stream branch:
    ```bash
-   rtk git worktree remove .worktrees/01-storage
-   rtk git branch -d feat/01/storage
+   git worktree remove .worktrees/01-storage
+   git branch -d feat/01/storage
    ```
 
 ---
@@ -71,7 +71,7 @@ If Stream B requires code introduced by Stream A:
 
 ```bash
 cd .worktrees/01-api
-rtk git rebase feat/01-data-pipeline
+git rebase feat/01-data-pipeline
 ```
 
 Resolve any rebasing conflicts inside the worktree, run the test suite, and continue execution.

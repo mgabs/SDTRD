@@ -89,6 +89,6 @@ mutants:
 ## 4. Commit Baseline
 
 ```bash
-rtk git add specs/ .gitignore Makefile
-rtk git commit -m "chore: initialize SDTRD workflow and testing rails"
+git add specs/ .gitignore Makefile
+git commit -m "chore: initialize SDTRD workflow and testing rails"
 ```

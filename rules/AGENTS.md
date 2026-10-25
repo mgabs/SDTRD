@@ -2,17 +2,17 @@
 
 When working in a repository containing `specs/WORKFLOW.md`:
 
-1. **Branch Isolation**: Never commit directly to `main`/`master`. Always use `feat/<id>-<name>` for features and isolated worktrees (`.worktrees/fix-<slug>` on branch `fix/<slug>`) for bugfixes.
-2. **Strict Human Gates**: Stop and obtain explicit human approval at every gate before advancing:
-   - **Features**: Gate 0 (`research.md`) $\rightarrow$ Gate 1 (`proposal.md`) $\rightarrow$ Gate 2 (`specs/<cap>/spec.md`) $\rightarrow$ Gate 3 (`design.md`) $\rightarrow$ Gate 4 (`tasks.md`) $\rightarrow$ Gate 5.x (BDD scenarios per slice) $\rightarrow$ Gate 6 (Sync & Archive).
-   - **Bugs**: Gate B1 (`specs/bug-reports/<date>-<slug>.md`) $\rightarrow$ Gate B2 (Failing Red regression test in isolated worktree) $\rightarrow$ Gate B3 (Minimal Green fix + `--ff-only` merge).
+1. **Pick a Lane First**: Feature (`feat/<id>-<slug>`, Gates 0–6), Bugfix (`fix/<slug>`, Gates B1–B3), or Chore (`chore/<slug>`, zero behavior change, no gates). Never commit on `main`/`master`.
+2. **Strict Human Gates**: Stop and obtain explicit human approval at every gate. A gate passes only when its Review Gate checkbox is ticked and committed.
+   - **Features**: Gate 0 (`research.md`) → Gate 1 (`proposal.md`) → Gate 2 (`specs/<cap>/spec.md`, full copy, never delta) → Gate 3 (`design.md`) → Gate 4 (`tasks.md`) → Gate 5.x (BDD per slice) → Gate 6 (Sync, Archive, Merge).
+   - **Bugs**: Gate B1 (`specs/bug-reports/<date>-<slug>.md`) → Gate B2 (Red regression test shown, uncommitted) → Gate B3 (Green fix + docs/spec sync + merge).
 3. **Testing Rails**:
-   - Write failing unit tests (`Red`) before production code (`Green`).
-   - Enforce $\ge 95\%$ line and branch coverage and $100\%$ mutation kill score on domain/core logic.
-   - Never delete assertions, skip failing tests, or write vacuous tests to force a green run.
-4. **Pre-Commit Verification & Commit Hygiene**:
-   - Always install and maintain pre-commit hooks (`.pre-commit-config.yaml`).
-   - Run all linters, formatting checks, and test suites prior to committing.
-   - Inspect `rtk git status` and `rtk git diff` before every commit.
-   - Never bypass hooks using `--no-verify` or `-n`.
-5. **LGTM Harness & Directive Preemption**: Review directives (`#ref file:line`) preempt all forward progress. When incoming review directives exist in `.lgtm/reviews/` or user chat, immediately halt active `tasks.md` execution, resolve directives to clean verification, and only then resume forward tasks.
+   - Red before Green. Red tests are never committed alone; commit them together with Green.
+   - $\ge 95\%$ line and branch coverage; $100\%$ mutation kill score, no exemptions (kill, delete dead code, or restructure equivalent mutants away).
+   - Never delete assertions, skip failing tests, or write vacuous tests.
+4. **Commit & Merge Hygiene**:
+   - Pre-commit hooks installed; run linters, formatters, and the full suite before every commit. Never `--no-verify`.
+   - Inspect `git status` and `git diff` before every commit.
+   - Before any merge: rebase onto target, re-verify rails, merge `--ff-only`.
+   - `specs/ROADMAP.md` changes only on `main` via `chore/roadmap-<id>`.
+5. **LGTM Directive Preemption**: Review directives (`#ref file:line`) in `.lgtm/reviews/` or chat preempt all forward work. Halt `tasks.md`, resolve, verify, then resume.

@@ -9,13 +9,13 @@ This guide demonstrates end-to-end execution of a feature under the SDTRD lifecy
 Never work on `main`. Start a dedicated feature branch:
 
 ```bash
-rtk git checkout -b feat/01-user-authentication
+git checkout -b feat/w1.1-user-authentication
 ```
 
 Create the feature directory in `specs/features/`:
 
 ```bash
-mkdir -p specs/features/01-user-authentication/specs
+mkdir -p specs/features/w1.1-user-authentication/specs
 ```
 
 ---
@@ -24,7 +24,7 @@ mkdir -p specs/features/01-user-authentication/specs
 
 1. Copy the research template:
    ```bash
-   cp specs/templates/research.md specs/features/01-user-authentication/research.md
+   cp specs/templates/research.md specs/features/w1.1-user-authentication/research.md
    ```
 2. Document:
    - **Ground Truth**: Verified constraints in existing codebase and docs.
@@ -39,7 +39,7 @@ mkdir -p specs/features/01-user-authentication/specs
 
 1. Copy the proposal template:
    ```bash
-   cp specs/templates/proposal.md specs/features/01-user-authentication/proposal.md
+   cp specs/templates/proposal.md specs/features/w1.1-user-authentication/proposal.md
    ```
 2. Fill in:
    - **Intent**: High-level capability summary.
@@ -52,10 +52,16 @@ mkdir -p specs/features/01-user-authentication/specs
 
 ## Step 4: Gate 2 — Specifications
 
-1. For each capability, copy the spec template:
-   ```bash
-   cp specs/templates/spec.md specs/features/01-user-authentication/specs/token-verification/spec.md
-   ```
+1. For each capability, create a **full** spec (never a partial delta):
+   - **Existing capability** — start from the living spec, then edit in place (mark retired keys `[DEPRECATED by w1.1]`, never reuse keys):
+     ```bash
+     mkdir -p specs/features/w1.1-user-authentication/specs/token-verification
+     cp specs/living/token-verification/spec.md specs/features/w1.1-user-authentication/specs/token-verification/spec.md
+     ```
+   - **New capability** — start from the template:
+     ```bash
+     cp specs/templates/spec.md specs/features/w1.1-user-authentication/specs/token-verification/spec.md
+     ```
 2. Fill in:
    - **Functional Requirements**: `REQ-AUTH-1`, `REQ-AUTH-2`, etc.
    - **Non-Functional Requirements & Budgets**: `NFR-AUTH-1` (e.g. verification latency $< 2\text{ms}$).
@@ -68,7 +74,7 @@ mkdir -p specs/features/01-user-authentication/specs
 
 1. Copy the design template:
    ```bash
-   cp specs/templates/design.md specs/features/01-user-authentication/design.md
+   cp specs/templates/design.md specs/features/w1.1-user-authentication/design.md
    ```
 2. Document:
    - Domain models, state machines, and interfaces.
@@ -82,7 +88,7 @@ mkdir -p specs/features/01-user-authentication/specs
 
 1. Copy the tasks template:
    ```bash
-   cp specs/templates/tasks.md specs/features/01-user-authentication/tasks.md
+   cp specs/templates/tasks.md specs/features/w1.1-user-authentication/tasks.md
    ```
 2. Structure the DAG into vertical slices and identify orthogonal streams suitable for parallel worktrees.
 3. **Gate 4 Review**: Human approval required before writing any test code.
@@ -96,22 +102,29 @@ For each vertical slice:
 1. **Step 5.x-A (BDD)**: Write Gherkin `.feature` scenarios.
    - **Gate 5.x Review**: Human inspects scenarios.
 2. **Step 5.x-B (Red-Green-Refactor)**:
-   - Write failing unit tests (`Red`). Verify test failure.
-   - Implement minimal code to pass (`Green`).
+   - Write failing unit tests (`Red`). Verify test failure. Do **not** commit yet — the pre-commit suite would reject it.
+   - Implement minimal code to pass (`Green`). Commit tests and code together.
    - Clean up code under green test protection.
    - Enforce $\ge 95\%$ line and branch coverage.
 3. **Step 5.x-C (Mutation Testing)**:
-   - Run mutation tests.
-   - Catch and eliminate 100% of surviving mutants.
+   - Run mutation tests scoped to the slice.
+   - Kill 100% of survivors: add an assertion, delete dead code, or restructure equivalent mutants away. No exemptions.
 
 ---
 
-## Step 8: Gate 6 — Sync & Archive
+## Step 8: Gate 6 — Sync, Archive & Merge
 
-1. Run the entire regression suite and mutation suite.
-2. Merge stream worktrees with `--ff-only`.
-3. Promote delta specs to canonical living specifications:
+1. Merge stream worktrees (rebase + re-verify each, then `--ff-only`) and prune them.
+2. Rebase onto `main`, then run the full test suite and full-project mutation suite.
+3. Promote specs to living (safe overwrite thanks to the full-copy rule):
    ```bash
-   cp specs/features/01-user-authentication/specs/*/*.spec.md specs/living/
+   cp -R specs/features/w1.1-user-authentication/specs/. specs/living/
    ```
-4. Check off all tasks in `tasks.md` and obtain Gate 6 human sign-off.
+4. Tick all tasks and the Gate 6 box in `tasks.md`, archive, commit, and merge:
+   ```bash
+   git mv specs/features/w1.1-user-authentication specs/archive/w1.1-user-authentication
+   git commit -m "feat(w1.1): ship user authentication"
+   git checkout main
+   git merge --ff-only feat/w1.1-user-authentication
+   ```
+5. Mark `✅ Shipped` in `specs/ROADMAP.md` through a `chore/roadmap-w1.1` branch.

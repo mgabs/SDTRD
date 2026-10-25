@@ -11,22 +11,23 @@ description: >-
 
 Follow [specs/WORKFLOW.md](../../specs/WORKFLOW.md) and copy templates from [templates/](../../templates/).
 
-## Initialization
+## 1. Pick a Lane First
 
-Initialize a target repository:
-```bash
-sdtrd [target-repo-path]
-```
+- **Feature** (`feat/<id>-<slug>`): Follow Gates 0–6.
+- **Bugfix** (`fix/<slug>`): Follow Gates B1–B3.
+- **Chore** (`chore/<slug>`): Zero behavior change; run pre-commit & tests; no gates.
 
-## Gate Execution Checklist
+## 2. Gate Execution Checklist
 
-1. **Gate 0 (Research & Tradeoffs)**: Copy [templates/research.md](../../templates/research.md) $\rightarrow$ `specs/features/<id>-<slug>/research.md`. Present 2–3 options & tradeoffs. Stop for human developer decision.
+1. **Gate 0 (Research & Tradeoffs)**: Copy [templates/research.md](../../templates/research.md) $\rightarrow$ `specs/features/<id>-<slug>/research.md`. Present 2–3 options, tradeoffs, and breaking changes. Stop for human developer decision.
+   - If **Go**: Update `specs/ROADMAP.md` to `🚀 In Progress` via `chore/roadmap-<id>`.
+   - If **No-Go**: Commit `research.md` to `specs/archive/<id>-<slug>/`, mark `❌ Dropped` in `specs/ROADMAP.md` with rationale via `chore/roadmap-<id>`, and prune feature branch.
 2. **Gate 1 (Proposal)**: Copy [templates/proposal.md](../../templates/proposal.md) $\rightarrow$ `specs/features/<id>-<slug>/proposal.md` based on chosen option. Stop for human review.
-3. **Gate 2 (Specs)**: Copy [templates/spec.md](../../templates/spec.md) $\rightarrow$ `specs/features/<id>-<slug>/specs/<capability>/spec.md`. Stop for human review.
+3. **Gate 2 (Specs)**: Full capability specs (never partial deltas). If modifying existing capability, start from `specs/living/<cap>/spec.md`. Stop for human review.
 4. **Gate 3 (Design)**: Copy [templates/design.md](../../templates/design.md) $\rightarrow$ `specs/features/<id>-<slug>/design.md`. Stop for human review.
 5. **Gate 4 (Tasks)**: Copy [templates/tasks.md](../../templates/tasks.md) $\rightarrow$ `specs/features/<id>-<slug>/tasks.md` with DAG and worktree streams. Stop for human review.
-6. **Apply (Step 5.x)**: Per vertical slice:
+6. **Apply (Gate 5.x)**: Per vertical slice:
    - **5.x-A**: Write BDD `.feature` scenarios $\rightarrow$ **Stop for Gate 5.x human approval**.
-   - **5.x-B**: Write failing unit tests (`Red`) $\rightarrow$ minimal code (`Green`) $\rightarrow$ verify $\ge 95\%$ line/branch coverage.
-   - **5.x-C**: Run mutation testing $\rightarrow$ achieve $100\%$ kill score on core logic.
-7. **Gate 6 (Archive)**: Merge worktrees (`--ff-only`), sync specs into `specs/living/`, mark `tasks.md` complete.
+   - **5.x-B**: Write failing unit tests (`Red`) tested locally, then implement minimal code (`Green`). Commit tests + code together. Line & branch coverage $\ge 95\%$.
+   - **5.x-C**: Run mutation testing $\rightarrow$ achieve $100\%$ kill score on core logic (no exemptions: kill, delete dead code, or restructure equivalent mutants).
+7. **Gate 6 (Archive & Merge)**: Rebase onto `main`, re-verify rails, sync specs to `specs/living/` (safe overwrite), archive to `specs/archive/<id>-<slug>/`, merge `--ff-only`, and update `specs/ROADMAP.md` to `✅ Shipped`.

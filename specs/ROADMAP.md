@@ -15,12 +15,12 @@ flowchart LR
 
 ## 2. Work Items & Backlog
 
-Status Legend:
+Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `specs/WORKFLOW.md` §2):
 - `⬜ Planned`: Scheduled for execution.
 - `🔬 In Research (Gate 0)`: Actively investigating technical feasibility and options.
-- `🚀 In Progress (Gates 1–5)`: Active feature branch / worktree streams.
+- `🚀 In Progress (Gates 1–6)`: Gate 0 Go decision made; active feature branch / worktree streams.
 - `✅ Shipped`: Verified, merged, living specs synced, archived.
-- `❌ Dropped`: Discarded at Gate 0 with documented rationale.
+- `❌ Dropped`: Discarded at Gate 0; rationale here, research in `specs/archive/<id>-<slug>/`.
 
 ### Wave 1: Protocol, Lifecycle & Core Templates
 
@@ -38,6 +38,7 @@ Status Legend:
 | **W2.1** | Pre-Commit Integration | S | W1.1 | ✅ | `.pre-commit-config.yaml` | Zero-bypass formatting, linting, tests |
 | **W2.2** | Reusable GitHub CI Workflow | S | W1.2 | ✅ | `templates/sdtrd-ci.yml` | Spec-to-code audit + testing rail verification |
 | **W2.3** | LGTM Review Pairing Specs | M | W1.1 | ✅ | `docs/WIKI.md` | Line-anchored `#ref` steering and anti-fraud guardrails |
+| **W2.4** | Chore Lane & Contradiction Pruning | S | W1.1, W2.2 | ✅ | `specs/WORKFLOW.md` | Red-commit policy, chore lane, full-copy spec rule |
 
 ---
 

@@ -11,23 +11,24 @@ SDTRD (Spec-Driven, Testing-Railed Development) is an engineering and AI-agent o
 - **Minimal Blast Radius**: Code changes must touch only the files strictly necessary to satisfy the active vertical slice.
 
 ### 1.2 Zero-Contamination Isolation
-- Production branches (`main` / `master`) are immutable to direct edits.
-- Feature work occurs on isolated branches (`feat/<id>-<name>`).
+- Production branches (`main` / `master`) are immutable to direct edits; everything lands via `--ff-only` after rebase + re-verification.
+- Three lanes: features (`feat/<id>-<slug>`, Gates 0–6), bugfixes (`fix/<slug>`, Gates B1–B3), chores (`chore/<slug>`, zero behavior change, no gates).
 - Concurrent subagent execution occurs in dedicated Git worktrees (`.worktrees/<id>-<stream>`).
 - Bugfixes occur in dedicated bugfix worktrees (`.worktrees/fix-<slug>`) branching directly off the base branch, preventing feature-branch bleed into hotfixes.
 
 ### 1.3 Testing Rails (Red-First & 100% Mutation Kill)
 - Code does not exist until a test fails for its absence.
+- Red tests are verified locally, never committed alone; they ship in the same commit as the Green code, so every branch tip stays green.
 - Coverage metrics ($\ge 95\%$ line & branch) are necessary but insufficient.
-- Every logical branch must survive mutation analysis (100% mutation kill score on core business logic). Any surviving mutant is treated as a blocking bug.
+- Every logical branch must survive mutation analysis (100% mutation kill score on core business logic, no exemptions). Any surviving mutant is treated as a blocking bug.
 
 ### 1.4 Living Specifications
 - Specs are not discarded design documents.
-- Delta specs created during feature proposals are synced into `specs/living/` upon feature completion (Gate 6), providing an evergreen, authoritative ground truth of system capabilities.
+- Feature specs are full copies of a capability's spec (never partial deltas), so syncing them into `specs/living/` at Gate 6 is a safe overwrite that keeps an evergreen, authoritative ground truth.
 
 ### 1.5 Pre-Commit Verification & Zero-Bypass Protocol
 - Every project must maintain active pre-commit hooks (`.pre-commit-config.yaml`).
-- Before any commit: inspect `rtk git status` / `rtk git diff`, run all linters, and execute all tests.
+- Before any commit: inspect `git status` / `git diff`, run all linters, and execute all tests.
 - Never bypass hooks using `git commit --no-verify` or `-n`. If a check fails, resolve the defect before committing.
 
 ---
@@ -84,18 +85,19 @@ When a feature contains orthogonal tasks (decoupled modules, distinct endpoints,
    - `Stream B`: Parser / Data ingestion
 2. **Worktree Spawning**:
    ```bash
-   rtk git worktree add .worktrees/<feat>-stream-a -b feat/<feat>/stream-a
-   rtk git worktree add .worktrees/<feat>-stream-b -b feat/<feat>/stream-b
+   git worktree add .worktrees/<feat>-stream-a -b feat/<feat>/stream-a
+   git worktree add .worktrees/<feat>-stream-b -b feat/<feat>/stream-b
    ```
-3. **Agent Isolation**: Subagents are dispatched into the worktree path (`Workspace: 'share'`). No agent can dirty another agent's working directory.
-4. **Integration**: Completed streams are merged fast-forward into the feature branch:
+3. **Agent Isolation**: Each subagent is scoped to its own worktree path. No agent can dirty another agent's working directory.
+4. **Integration**: Every stream rebases onto the feature branch, re-runs unit + slice mutation suites, then merges fast-forward:
    ```bash
-   rtk git checkout feat/<feat>-<name>
-   rtk git merge --ff-only feat/<feat>/stream-a
-   rtk git worktree remove .worktrees/<feat>-stream-a
-   rtk git branch -d feat/<feat>/stream-a
+   git -C .worktrees/<feat>-stream-a rebase feat/<feat>-<name>
+   git checkout feat/<feat>-<name>
+   git merge --ff-only feat/<feat>/stream-a
+   git worktree remove .worktrees/<feat>-stream-a
+   git branch -d feat/<feat>/stream-a
    ```
-5. **Rebasing**: If Stream B requires artifacts produced by Stream A, Stream B rebases on `feat/<feat>-<name>` before proceeding.
+5. **Rebasing**: The same rebase-and-re-verify rule applies to every merge in SDTRD — streams into features, features/fixes/chores into `main`.
 
 ---
 
@@ -110,6 +112,7 @@ When a feature contains orthogonal tasks (decoupled modules, distinct endpoints,
 When a mutant survives:
 1. **Case A: Missing Assertion**: The test suite failed to assert a critical boundary. Fix: Add a targeted assertion.
 2. **Case B: Dead Code**: The code survived because its deletion does not alter system behavior. Fix: Delete the dead code (Ponytail rule).
+3. **Case C: Equivalent Mutant**: The mutant behaves identically to the original (e.g. `i < n` → `i != n` in an index loop), so no test can kill it. Fix: Restructure the code so the equivalence disappears (iterators instead of index loops, remove redundant conditions). No exemption lists, skip comments, or lowered thresholds.
 
 ---
 
