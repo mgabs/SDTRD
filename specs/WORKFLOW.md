@@ -116,7 +116,8 @@ specs/
 
 ```mermaid
 flowchart TD
-    B0[Checkout feat/branch] --> G1[Gate 1: Proposal Review]
+    B0[Checkout feat/branch] --> G0[Gate 0: Research & Discovery Review]
+    G0 --> G1[Gate 1: Proposal Review]
     G1 --> G2[Gate 2: Specs Review]
     G2 --> G3[Gate 3: Architecture & Design Review]
     G3 --> G4[Gate 4: Tasks Breakdown Review]
@@ -151,6 +152,18 @@ flowchart TD
 
     MA & MB --> G6[Gate 6: Spec Sync & Archive]
 ```
+
+### Gate 0: Research & Discovery Review
+- **Mandatory Requirement**: Every feature MUST conduct empirical research and investigate technical trade-offs *before committing to building the feature* or locking in proposals and architectural designs.
+- **Artifact**: `specs/features/<feature>/research.md`
+- **Mandatory Sections**:
+  - **Intent & Research Goals**: Core questions and feasibility risks to resolve.
+  - **Prior Art & Ecosystem Survey**: Analysis of existing libraries, models, papers, or internal tools (reusable vs build).
+  - **Empirical Spikes & Feasibility**: Micro-benchmarks, latency measurements, memory usage, pricing models, or API rate limits.
+  - **Dataset & Input Nuances**: Inspection of real-world datasets, class distributions, noise, and edge cases.
+  - **Alternatives Considered & Trade-Offs**: Comparative trade-off matrix of at least 2–3 candidate approaches.
+  - **Risks & Mitigations**: Identified failure modes and architectural bottlenecks.
+- **Gate**: Human approval required before drafting proposal and specifications.
 
 ### Gate 1: Proposal Review
 - **Artifact**: `specs/features/<feature>/proposal.md`
