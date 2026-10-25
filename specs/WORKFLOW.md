@@ -49,9 +49,10 @@
        rtk git worktree remove .worktrees/<feature-id>-<stream-name>
        rtk git branch -d feat/<feature-id>/<stream-name>
        ```
-     - Subsequent streams MUST rebase onto the updated feature branch before merging:
+     - Subsequent streams MUST rebase onto the updated feature branch and re-verify testing rails before merging:
        ```bash
        rtk git -C .worktrees/<feature-id>-<stream-2> rebase feat/<feature-id>-<feature-name>
+       # MUST re-run unit tests and slice mutation tests in worktree post-rebase
        rtk git checkout feat/<feature-id>-<feature-name>
        rtk git merge --ff-only feat/<feature-id>/<stream-2>
        rtk git worktree remove .worktrees/<feature-id>-<stream-2>
@@ -264,7 +265,7 @@ Execute each vertical slice through three strict sub-steps:
 - **Scoped Run**: Scope mutation runner strictly to the active slice module (e.g., targeting only modified slice files) to avoid re-mutating completed slices. Full codebase mutation run is reserved for Gate 6.
 - **Surviving Mutant Protocol**: Every surviving mutant is a blocking defect. Resolve by:
   1. Adding a targeted test assertion that kills the mutant, OR
-  2. Deleting redundant/unreachable code (Ponytail / YAGNI rule).
+  2. Deleting redundant/unreachable code (Ponytail / YAGNI rule). If a mutant survives on an unreachable defensive assertion or branch, delete the redundant code; never mask surviving mutants with skip directives.
 - **Target**: $100\%$ mutation kill rate on slice domain and core logic.
 
 ---
@@ -273,6 +274,7 @@ Execute each vertical slice through three strict sub-steps:
 
 SDTRD integrates natively with [mgabs/lgtm](https://github.com/mgabs/lgtm) as the real-time code review cockpit and agent steering harness:
 
+- **Directive Preemption Invariant**: Review directives (`#ref file:line`) preempt all forward progress. When incoming review directives exist in `.lgtm/reviews/` or user chat, the agent MUST halt active `tasks.md` execution and resolve all review directives to clean verification before resuming any forward tasks.
 - **Anchor Directives**: Honor line-anchored feedback directives (`#ref file:line <directive>`) emitted by `lgtm`. Acknowledge directive, resolve at exact target line, verify test pass, and commit.
 - **Review Inbox**: Check `.lgtm/reviews/` and inline user directives on every turn; resolve review items before advancing gates.
 - **Pre-Commit Verification**: Run all linters, formatting checks, and test suites prior to committing. Never bypass hooks with `--no-verify`.

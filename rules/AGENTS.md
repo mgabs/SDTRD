@@ -15,4 +15,4 @@ When working in a repository containing `specs/WORKFLOW.md`:
    - Run all linters, formatting checks, and test suites prior to committing.
    - Inspect `rtk git status` and `rtk git diff` before every commit.
    - Never bypass hooks using `--no-verify` or `-n`.
-5. **LGTM Harness**: Check `.lgtm/reviews/` and `#ref file:line` directives on every turn and resolve them before advancing gates.
+5. **LGTM Harness & Directive Preemption**: Review directives (`#ref file:line`) preempt all forward progress. When incoming review directives exist in `.lgtm/reviews/` or user chat, immediately halt active `tasks.md` execution, resolve directives to clean verification, and only then resume forward tasks.
