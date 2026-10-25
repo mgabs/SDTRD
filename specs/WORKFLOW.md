@@ -8,11 +8,11 @@
   ```bash
   rtk git checkout -b feat/<feature-id>-<feature-name>
   ```
-- All proposal, specs, design, tasks, and vertical-slice work commits to this feature branch.
+- All research, proposal, specs, design, tasks, and vertical-slice work commits to this feature branch.
 
 ### Rule 2: Multi-Agent Parallel Streams via Git Worktrees
 - When tasks/slices have **no mutual dependencies** (orthogonal modules, distinct capabilities, or decoupled tests):
-  1. **Pre-Requisite Contract Lock**: Any shared domain models, interfaces, or contracts (e.g. `core/models.py`) MUST be implemented, tested, and committed to the parent feature branch *before* spawning parallel worktrees.
+  1. **Pre-Requisite Contract Lock**: Any shared domain models, interfaces, or contracts (e.g., core types, traits, or domain contracts) MUST be implemented, tested, and committed to the parent feature branch *before* spawning parallel worktrees.
   2. **Worktree Hygiene & Git Config Guard (`core.bare` Trap)**:
      - Ensure `.worktrees/` is present in root `.gitignore`.
      - Check for and clean any stale `.git/index.lock` prior to worktree operations:
@@ -28,11 +28,11 @@
      rtk git worktree add .worktrees/<feature-id>-<stream-name> -b feat/<feature-id>/<stream-name>
      ```
   4. **Environment & Path Resolution**:
-     - Tests and modules MUST resolve repository and dataset roots dynamically (e.g. iterating `Path(__file__).parents` until root marker like `.git` or `pyproject.toml` is found).
-     - Reuse parent virtual environment (`.venv`) inside the worktree without reinstallation.
+     - Tests and modules MUST resolve paths relative to the project root or Git repository boundary, avoiding hardcoded parent directory traversal.
+     - Reuse the project's shared build cache and dependencies inside the worktree without reinstallation.
   5. **Concurrently Dispatched Subagents & Human Gate Escalation**:
      - Dispatch a dedicated subagent (`invoke_subagent`) per stream, passing the worktree directory.
-     - **Hard Prohibition**: Subagents **NEVER** self-approve human gates (Gates 1, 2, 3, 4, 5.x, 6, B1, B2) or jump ahead into coding autonomously.
+     - **Hard Prohibition**: Subagents **NEVER** self-approve human gates (Gates 0, 1, 2, 3, 4, 5.x, 6, B1, B2, B3) or jump ahead into coding autonomously.
      - **Main-Loop Escalation Protocol**: Upon completing any gate artifact, the subagent MUST pause, send a message to the Lead Orchestrator on the main loop, and halt execution.
      - **User Clearance**: Lead Orchestrator presents the clickable artifact link to the human user. Clearance is delivered back to the subagent only after explicit human approval in the main conversation.
      - Each agent executes its vertical slice in isolation:
@@ -105,19 +105,26 @@
 ## 2. Feature Lifecycle & Human Gates
 
 ### Canonical Directory Layout
-```
+```text
 specs/
-├── WORKFLOW.md
-├── features/       <-- Active in-progress feature development (proposals, designs, tasks, specs)
+├── WORKFLOW.md     <-- Operating procedures and human review gate rails
+├── ROADMAP.md      <-- Project-level waves, backlog, dependency spine, and exit criteria
+├── features/       <-- Active in-progress feature development (research, proposals, designs, tasks, specs)
 ├── living/         <-- Canonical living specifications of shipped capabilities
-├── archive/        <-- Archived lifecycle artifacts (proposals, designs, tasks of merged features)
-└── bug-reports/    <-- Documented defect triage reports
+├── archive/        <-- Archived lifecycle artifacts of merged features
+├── bug-reports/    <-- Documented defect triage reports
+└── templates/      <-- Reusable lifecycle markdown artifacts
 ```
 
 ```mermaid
 flowchart TD
-    B0[Checkout feat/branch] --> G0[Gate 0: Research & Discovery Review]
-    G0 --> G1[Gate 1: Proposal Review]
+    RD[specs/ROADMAP.md: Select Work Item] --> B0[Checkout feat/branch]
+    B0 --> G0[Gate 0: Research & Tradeoffs Review]
+    G0 --> Dec0{Developer Decision}
+
+    Dec0 -- Go: Option Selected --> G1[Gate 1: Proposal Review]
+    Dec0 -- No-Go: Dropped --> Drop[Mark ❌ Dropped in ROADMAP.md & Prune Branch]
+
     G1 --> G2[Gate 2: Specs Review]
     G2 --> G3[Gate 3: Architecture & Design Review]
     G3 --> G4[Gate 4: Tasks Breakdown Review]
@@ -151,6 +158,7 @@ flowchart TD
     StreamB_Loop --> MB[Rebase & Merge Worktree B]
 
     MA & MB --> G6[Gate 6: Spec Sync & Archive]
+    G6 --> UpdRD[Mark ✅ Shipped in ROADMAP.md]
 ```
 
 ### Gate 0: Research & Tradeoffs Review
@@ -249,7 +257,7 @@ Execute each vertical slice through three strict sub-steps:
 - **Performance Verification**: Verify any `NFR-*` latency or allocation budgets with deterministic benchmarks/assertions.
 
 ### Step 5.x-C: Mutation Testing (100% Kill Score)
-- **Scoped Run**: Scope mutation runner strictly to the active slice module (e.g., `mutmut run --paths-to-mutate src/<slice>/`) to avoid re-mutating completed slices. Full codebase mutation run is reserved for Gate 6.
+- **Scoped Run**: Scope mutation runner strictly to the active slice module (e.g., targeting only modified slice files) to avoid re-mutating completed slices. Full codebase mutation run is reserved for Gate 6.
 - **Surviving Mutant Protocol**: Every surviving mutant is a blocking defect. Resolve by:
   1. Adding a targeted test assertion that kills the mutant, OR
   2. Deleting redundant/unreachable code (Ponytail / YAGNI rule).
@@ -283,9 +291,13 @@ SDTRD integrates natively with [mgabs/lgtm](https://github.com/mgabs/lgtm) as th
 3. Ensure all parallel stream worktrees are merged (`--ff-only`) into the feature branch and pruned.
 4. Sync feature delta specs (`specs/features/<feature>/specs/`) into the canonical living specifications directory (`specs/living/`).
 5. Check off all items in `specs/features/<feature>/tasks.md` and record Gate 6 completion.
-6. Archive feature proposal and tasks to `specs/archive/<feature>/`.
+6. Move feature lifecycle artifacts (`research.md`, `proposal.md`, `design.md`, `tasks.md`) to `specs/archive/<feature>/`:
+   ```bash
+   rtk git mv specs/features/<feature> specs/archive/<feature>
+   ```
 7. Fast-forward merge feature branch into `main`:
    ```bash
    rtk git checkout main
    rtk git merge --ff-only feat/<feature-id>-<feature-name>
    ```
+8. Update `specs/ROADMAP.md` work item status to `✅ Shipped`.
