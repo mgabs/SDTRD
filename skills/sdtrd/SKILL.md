@@ -11,6 +11,13 @@ description: >-
 
 Follow [specs/WORKFLOW.md](../../specs/WORKFLOW.md) and copy templates from [templates/](../../templates/).
 
+## 0. The Ponytail Mindset & Strict YAGNI
+
+- Strictly apply YAGNI (You Aren't Gonna Need It). Build exactly what is asked; do not over-engineer or add unsolicited features.
+- Zero speculative architecture: no unused abstractions, premature plugin frameworks, or hypothetical configuration flags.
+- Minimal blast radius: touch only files strictly required for the slice.
+- Kill mutants or delete dead code: any surviving mutant triggers deletion of unneeded code.
+
 ## 1. Pick a Lane First
 
 - **Feature** (`feat/<id>-<slug>`): Follow Gates 0–6.

@@ -26,9 +26,10 @@ flowchart LR
     SDTRD_Protocol <--> LGTM_Harness
 ```
 
-### 1. Spec-Driven, Not Prompt-Driven
+### 1. Spec-Driven, Not Prompt-Driven (The Ponytail Mindset & Strict YAGNI)
 - AI agents easily over-engineer or misinterpret informal prompts.
-- SDTRD mandates structured **Human Gates** before code is written:
+- SDTRD applies the **Ponytail Mindset**: strictly adhere to YAGNI (You Aren't Gonna Need It), eliminating speculative abstractions and unsolicited features.
+- Structured **Human Gates** enforce boundaries before code is written:
   - **Gate 1 (Proposal)**: Pinpoints intent, measurable success metrics, and strict Out-of-Scope (YAGNI) boundaries.
   - **Gate 2 (Specs)**: Formalizes uniquely keyed requirements (`REQ-*`, `NFR-*`) and Given/When/Then scenarios.
   - **Gate 3 (Design)**: Enforces domain boundaries (Pure Core vs. I/O Shell) and latency/allocation budgets.

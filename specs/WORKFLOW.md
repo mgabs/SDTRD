@@ -249,10 +249,11 @@ SDTRD pairs with [mgabs/lgtm](https://github.com/mgabs/lgtm) as the review cockp
   - NEVER delete or weaken assertions to force green (`lgtm`'s test-neutering guard will flag it).
   - NEVER write vacuous assertions or tautological mocks.
   - NEVER skip/ignore failing tests without explicit human sign-off.
-- **Boundaries & Hygiene**:
+- **Boundaries & Hygiene (The Ponytail Mindset & Strict YAGNI)**:
+  - Strictly apply YAGNI (You Aren't Gonna Need It). Build strictly what is specified without speculative extras or premature abstractions.
   - Pure domain core: no direct I/O, network, or framework coupling.
   - Touch only files in the active slice (minimal blast radius).
-  - No dead or unreferenced code (YAGNI).
+  - No dead or unreferenced code (Ponytail rule: delete dead code when mutants survive).
   - No scratch files, debug dumps, or `.env` artifacts in the tree.
 
 ---
