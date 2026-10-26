@@ -19,5 +19,10 @@ jobs:
         with:
           scandir: './bin ./tests'
 
+      - name: Set up Pre-Commit & Run Hooks
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files
+
       - name: Run Test Suite
         run: make test
