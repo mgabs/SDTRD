@@ -12,8 +12,7 @@ repos:
     hooks:
       - id: check-lgtm-directives
         name: check unresolved lgtm review directives
-        entry: >-
-          sh -c 'if [ -d .lgtm/reviews ]; then directives=$(grep -rn "^#ref " .lgtm/reviews 2>/dev/null || true); if [ -n "$directives" ]; then echo "ERROR: Unresolved LGTM directives in .lgtm/reviews/:" >&2; echo "$directives" >&2; exit 1; fi; fi'
+        entry: make check-directives
         language: system
         pass_filenames: false
 
