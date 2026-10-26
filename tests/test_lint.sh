@@ -37,7 +37,20 @@ for template in roadmap.md research.md proposal.md spec.md design.md tasks.md bu
   fi
 done
 
-# 3. Shellcheck if installed
+# 3. YAML syntax validation
+if python3 -c "import yaml" >/dev/null 2>&1; then
+  for yml in "$REPO_ROOT/.pre-commit-config.yaml" "$REPO_ROOT/templates/.pre-commit-config.yaml" "$REPO_ROOT/templates/sdtrd-ci.yml" "$REPO_ROOT/.github/workflows/test.yml"; do
+    if [ -f "$yml" ]; then
+      if python3 -c "import yaml; yaml.safe_load(open('$yml'))" >/dev/null 2>&1; then
+        pass "YAML valid: $(basename "$yml")"
+      else
+        fail "YAML invalid: $(basename "$yml")" "safe_load failed"
+      fi
+    fi
+  done
+fi
+
+# 4. Shellcheck if installed
 if command -v shellcheck >/dev/null 2>&1; then
   if shellcheck "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_init.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh" "$REPO_ROOT/tests/test_lint.sh"; then
     pass "ShellCheck passed"
