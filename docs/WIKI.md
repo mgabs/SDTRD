@@ -2,6 +2,8 @@
 
 SDTRD (Spec-Driven, Testing-Railed Development) is an engineering and AI-agent orchestration framework designed to eliminate hallucinated scope, stale documentation, untested regressions, and branch contamination in autonomous and pair-programming development.
 
+For the comprehensive operational handbook, see [WAY_OF_WORKING.md](WAY_OF_WORKING.md).
+
 ---
 
 ## 1. Core Principles

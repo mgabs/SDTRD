@@ -60,6 +60,7 @@ sdtrd/
 ├── bin/
 │   └── sdtrd                 # Initialization script (`sdtrd [target-repo]`)
 ├── docs/
+│   ├── WAY_OF_WORKING.md     # Detailed Way of Working (WoW) engineering handbook
 │   ├── WIKI.md               # Architectural wiki, gate matrix & testing rails
 │   └── how-tos/
 │       ├── 01-bootstrap-new-project.md
