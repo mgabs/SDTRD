@@ -1,6 +1,11 @@
-.PHONY: test test-unit test-bdd bdd
+.PHONY: test test-lint test-unit test-bdd bdd lint
 
-test: test-unit test-bdd
+test: test-lint test-unit test-bdd
+
+lint: test-lint
+
+test-lint:
+	@sh tests/test_lint.sh
 
 test-unit:
 	@sh tests/test_init.sh
