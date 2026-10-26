@@ -8,11 +8,12 @@ if [ "$target" = "init" ]; then
   target="${2:-.}"
 fi
 
-mkdir -p "$target/specs/features" "$target/specs/bug-reports" "$target/specs/living" "$target/specs/archive" "$target/specs/templates"
+mkdir -p "$target/specs/features" "$target/specs/bug-reports" "$target/specs/living" "$target/specs/archive" "$target/specs/templates/mutation"
 cp "$SDTRD_ROOT/specs/WORKFLOW.md" "$target/specs/WORKFLOW.md"
 cp "$SDTRD_ROOT/templates/"*.md "$target/specs/templates/"
 cp "$SDTRD_ROOT/templates/.pre-commit-config.yaml" "$target/specs/templates/.pre-commit-config.yaml"
 cp "$SDTRD_ROOT/templates/sdtrd-ci.yml" "$target/specs/templates/sdtrd-ci.yml"
+cp "$SDTRD_ROOT/templates/mutation/"* "$target/specs/templates/mutation/"
 
 if [ ! -f "$target/specs/ROADMAP.md" ]; then
   cp "$SDTRD_ROOT/templates/roadmap.md" "$target/specs/ROADMAP.md"
@@ -33,7 +34,7 @@ if [ -d "$target/.git" ] && [ ! -f "$target/.git/hooks/pre-commit" ]; then
   cat <<'EOF' > "$target/.git/hooks/pre-commit"
 #!/bin/sh
 # SDTRD Workflow Branch Protection Hook
-branch="$(git rev-parse --abbrev-ref HEAD)"
+branch="$(git branch --show-current 2>/dev/null || git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
 if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
     echo "ERROR: Direct commits to '$branch' are forbidden by SDTRD workflow." >&2
     echo "Please checkout an isolated branch first:" >&2
@@ -41,6 +42,17 @@ if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
     echo "  git checkout -b fix/<slug>          (for bugfixes)" >&2
     echo "  git checkout -b chore/<slug>        (for chores/tooling)" >&2
     exit 1
+fi
+
+# SDTRD LGTM Directive Preemption Hook
+if [ -d ".lgtm/reviews" ]; then
+    directives="$(grep -rn "^#ref " .lgtm/reviews 2>/dev/null || true)"
+    if [ -n "$directives" ]; then
+        echo "ERROR: Unresolved LGTM review directives found in .lgtm/reviews/:" >&2
+        echo "$directives" >&2
+        echo "SDTRD Rule: Review directives preempt all forward work. Resolve and clear them before committing." >&2
+        exit 1
+    fi
 fi
 EOF
   chmod +x "$target/.git/hooks/pre-commit"

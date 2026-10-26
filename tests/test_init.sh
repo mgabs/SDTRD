@@ -62,6 +62,10 @@ assert_file_exists "$TMP1/specs/templates/tasks.md" "tasks template copied"
 assert_file_exists "$TMP1/specs/templates/bug-report.md" "bug-report template copied"
 assert_file_exists "$TMP1/specs/templates/.pre-commit-config.yaml" ".pre-commit-config.yaml template copied"
 assert_file_exists "$TMP1/specs/templates/sdtrd-ci.yml" "sdtrd-ci.yml template copied"
+assert_dir_exists "$TMP1/specs/templates/mutation" "mutation templates directory created"
+assert_file_exists "$TMP1/specs/templates/mutation/cargo-mutants.toml" "cargo-mutants.toml template copied"
+assert_file_exists "$TMP1/specs/templates/mutation/stryker.config.json" "stryker.config.json template copied"
+assert_file_exists "$TMP1/specs/templates/mutation/mutmut.ini" "mutmut.ini template copied"
 assert_file_exists "$TMP1/.pre-commit-config.yaml" ".pre-commit-config.yaml created in root"
 assert_file_exists "$TMP1/.gitignore" ".gitignore created"
 
@@ -94,11 +98,31 @@ CONTENT="$(cat "$TMP4/.pre-commit-config.yaml")"
 assert_eq "custom: pre-commit" "$CONTENT" "existing .pre-commit-config.yaml not overwritten"
 rm -rf "$TMP4"
 
-# Test 5: Inits git pre-commit branch hook when .git directory exists
+# Test 5: Inits git pre-commit hook with branch protection and LGTM directive preemption
 TMP5="$(mktemp -d /tmp/sdtrd-test5-XXXXXX)"
-git init "$TMP5" >/dev/null 2>&1
+git init -q -b main "$TMP5"
 sh "$BIN" "$TMP5" >/dev/null
 assert_file_exists "$TMP5/.git/hooks/pre-commit" ".git/hooks/pre-commit created"
+
+# 5a: Pre-commit hook blocks direct commit on main
+BLOCKED_MAIN=0
+(cd "$TMP5" && sh .git/hooks/pre-commit >/dev/null 2>&1) || BLOCKED_MAIN=1
+assert_eq "1" "$BLOCKED_MAIN" "pre-commit hook blocks direct commits to main"
+
+# 5b: Pre-commit hook blocks commit when unresolved #ref exists in .lgtm/reviews/
+(cd "$TMP5" && git checkout -q -b feat/test-branch)
+mkdir -p "$TMP5/.lgtm/reviews"
+printf "#ref src/lib.rs:42 fix mutation survivor\n" > "$TMP5/.lgtm/reviews/review1.md"
+BLOCKED_REF=0
+(cd "$TMP5" && sh .git/hooks/pre-commit >/dev/null 2>&1) || BLOCKED_REF=1
+assert_eq "1" "$BLOCKED_REF" "pre-commit hook blocks commit when #ref directive is active"
+
+# 5c: Pre-commit hook passes when on feature branch with directives resolved
+printf "resolved: all clear\n" > "$TMP5/.lgtm/reviews/review1.md"
+PASSED_CLEAR=0
+(cd "$TMP5" && sh .git/hooks/pre-commit >/dev/null 2>&1) && PASSED_CLEAR=1
+assert_eq "1" "$PASSED_CLEAR" "pre-commit hook passes on feature branch when directives are cleared"
+
 rm -rf "$TMP5"
 
 # Summary
