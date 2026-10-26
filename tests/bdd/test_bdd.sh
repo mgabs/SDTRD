@@ -69,8 +69,12 @@ else
   step_fail ".worktrees/ is present in .gitignore" "missing from .gitignore"
 fi
 
+git checkout -q -b chore/bootstrap-sdtrd
 git add .
 git commit -q -m "chore: bootstrap SDTRD"
+git checkout -q main
+git merge -q --ff-only chore/bootstrap-sdtrd
+git branch -q -d chore/bootstrap-sdtrd
 
 echo ""
 echo "Scenario 2: Feature Gate 0 Go decision advances to Proposal and preserves living specs"

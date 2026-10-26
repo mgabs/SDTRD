@@ -94,6 +94,13 @@ CONTENT="$(cat "$TMP4/.pre-commit-config.yaml")"
 assert_eq "custom: pre-commit" "$CONTENT" "existing .pre-commit-config.yaml not overwritten"
 rm -rf "$TMP4"
 
+# Test 5: Inits git pre-commit branch hook when .git directory exists
+TMP5="$(mktemp -d /tmp/sdtrd-test5-XXXXXX)"
+git init "$TMP5" >/dev/null 2>&1
+sh "$BIN" "$TMP5" >/dev/null
+assert_file_exists "$TMP5/.git/hooks/pre-commit" ".git/hooks/pre-commit created"
+rm -rf "$TMP5"
+
 # Summary
 echo ""
 echo "=== Test Summary ==="

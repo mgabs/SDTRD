@@ -2,6 +2,9 @@
 
 When working in a repository containing `specs/WORKFLOW.md`:
 
+0. **Pre-Execution Invariant (Zero Direct Edits to main)**:
+   - Before invoking `edit_file`, `write_file`, or running mutating commands, ALWAYS verify the active branch: `git branch --show-current`.
+   - If on `main` or `master`, HALT immediately. Checkout a dedicated lane branch first. Direct edits on `main` are strictly forbidden.
 1. **Pick a Lane First**: Feature (`feat/<id>-<slug>`, Gates 0–6), Bugfix (`fix/<slug>`, Gates B1–B3), or Chore (`chore/<slug>`, zero behavior change, no gates). Never commit on `main`/`master`.
 2. **Strict Human Gates**: Stop and obtain explicit human approval at every gate. A gate passes only when its Review Gate checkbox is ticked and committed.
    - **Features**: Gate 0 (`research.md`) → Gate 1 (`proposal.md`) → Gate 2 (`specs/<cap>/spec.md`, full copy, never delta) → Gate 3 (`design.md`) → Gate 4 (`tasks.md`) → Gate 5.x (BDD per slice) → Gate 6 (Sync, Archive, Merge).
