@@ -13,10 +13,12 @@ Follow [specs/WORKFLOW.md](../../specs/WORKFLOW.md) and copy templates from [tem
 
 ## 0. The Ponytail Mindset & Strict YAGNI
 
-- Strictly apply YAGNI (You Aren't Gonna Need It). Build exactly what is asked; do not over-engineer or add unsolicited features.
-- Zero speculative architecture: no unused abstractions, premature plugin frameworks, or hypothetical configuration flags.
-- Minimal blast radius: touch only files strictly required for the slice.
-- Kill mutants or delete dead code: any surviving mutant triggers deletion of unneeded code.
+- **Default answer is "No"**: Push back on vague or unneeded requirements before building.
+- **Boring > Clever**: Standard library over new dependencies. Simple logic over complex acrobatics.
+- **Code is a liability**: Smallest diff that satisfies specifications and passes gates wins.
+- **Zero speculative architecture**: No unused abstractions, premature plugin frameworks, or hypothetical configuration flags.
+- **Minimal blast radius**: Touch only files strictly required for the slice.
+- **Ruthless deletion**: Kill mutants or delete dead code. Any surviving mutant triggers deletion of unneeded code.
 
 ## 1. Pick a Lane First
 

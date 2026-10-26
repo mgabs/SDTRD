@@ -7,10 +7,13 @@ When working in a repository containing `specs/WORKFLOW.md`:
    - If on `main` or `master`, HALT immediately. Checkout a dedicated lane branch first. Direct edits on `main` are strictly forbidden.
 1. **The Ponytail Mindset & Strict YAGNI**:
    - Strictly apply YAGNI (You Aren't Gonna Need It). Build strictly what the active capability and slice require.
-   - Zero unsolicited architecture: never introduce speculative abstractions, unused helper functions, premature plugin hooks, or configurable flags.
+   - Default answer is "No": push back on vague, unneeded, or speculative requirements before writing a line of code.
+   - Boring > Clever: standard library over new dependencies, simple loops over metaprogramming acrobatics.
+   - Code is a liability: smallest diff that passes all gates wins.
+   - Zero unsolicited architecture: never introduce speculative abstractions, unused helper functions, premature plugin hooks, or hypothetical configuration flags.
    - Out-of-Scope (YAGNI) boundaries in `proposal.md` are binding prohibitions; reject any requirement bleed.
    - Minimal blast radius: touch only files strictly necessary for the active task.
-   - Delete dead code immediately upon mutation survival. Any code not provably required is dead code.
+   - Ruthless deletion: delete dead code immediately upon mutation survival. Any code not provably required is dead code.
 2. **Pick a Lane First**: Feature (`feat/<id>-<slug>`, Gates 0–6), Bugfix (`fix/<slug>`, Gates B1–B3), or Chore (`chore/<slug>`, zero behavior change, no gates). Never commit on `main`/`master`.
 3. **Strict Human Gates**: Stop and obtain explicit human approval at every gate. A gate passes only when its Review Gate checkbox is ticked and committed.
    - **Features**: Gate 0 (`research.md`) → Gate 1 (`proposal.md`) → Gate 2 (`specs/<cap>/spec.md`, full copy, never delta) → Gate 3 (`design.md`) → Gate 4 (`tasks.md`) → Gate 5.x (BDD per slice) → Gate 6 (Sync, Archive, Merge).
