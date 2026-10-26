@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-SDTRD_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
+SDTRD_ROOT="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
 BIN="$SDTRD_ROOT/bin/sdtrd"
 
 PASSED=0

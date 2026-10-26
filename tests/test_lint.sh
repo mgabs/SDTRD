@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-REPO_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+REPO_ROOT="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 
 FAILED=0
 PASSED=0
@@ -39,7 +39,7 @@ done
 
 # 3. Shellcheck if installed
 if command -v shellcheck >/dev/null 2>&1; then
-  if shellcheck "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_init.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh"; then
+  if shellcheck "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_init.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh" "$REPO_ROOT/tests/test_lint.sh"; then
     pass "ShellCheck passed"
   else
     fail "ShellCheck failed" "issues found"
