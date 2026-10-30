@@ -26,7 +26,7 @@ One slice drives the behavior; docs follow it. No parallel streams are warranted
 - [x] 4.1 Add a "Try it in a new repo" section to `docs/how-tos/01-bootstrap-new-project.md` linking `tests/test_e2e.sh` (verify: `make test-lint` link check passes)
 
 ## 5. Integration & Rebase Plan
-- [ ] 5.1 Rebase on main, re-verify rails (`make test`), `openspec validate w3-11-fresh-repo-e2e`, then `openspec archive`; mark W3.11 in `specs/ROADMAP.md` via `chore/roadmap-w3-11`
+- [x] 5.1 Rebase on main, re-verify rails (`make test`), `openspec validate w3-11-fresh-repo-e2e`, then `openspec archive`; mark W3.11 in `specs/ROADMAP.md` via `chore/roadmap-w3-11`
 
 ## Review Gate
 - [x] **Gate 4 Approval**: Tasks breakdown approved by human before writing test code.
