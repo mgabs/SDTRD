@@ -54,9 +54,9 @@ Shared-file protocol (Rule 3.7): both streams touch `Makefile`, `tests/bdd/test_
 - [x] 3.5 **Mutation (manual checklist)**: Ticked/unticked, missing section, `main`/`master`, exit-code flips.
 
 ### Slice 4: Protocol & Docs (REQ-OSA-7–10, 15, 19; Scenario 4.9)
-- [ ] 4.1 Update `specs/WORKFLOW.md`: delta-spec model, `openspec/` layout, Gate 6 via `openspec archive`, stream rebase + `openspec validate` rule, remove full-copy rule (migrated-project semantics; legacy layout noted for this repo until W3.8).
-- [ ] 4.2 Update `rules/AGENTS.md`, `skills/sdtrd/SKILL.md`, `README.md`, `docs/` for the addon install flow, `jq` prerequisite and `REQ-*` header convention.
-- [ ] 4.3 Chore-lane check: existing lint/unit/BDD suites unchanged and green.
+- [x] 4.1 Update `specs/WORKFLOW.md`: delta-spec model, `openspec/` layout, Gate 6 via `openspec archive`, stream rebase + `openspec validate` rule, remove full-copy rule (migrated-project semantics; legacy layout noted for this repo until W3.8).
+- [x] 4.2 Update `rules/AGENTS.md`, `skills/sdtrd/SKILL.md`, `README.md`, `docs/` for the addon install flow, `jq` prerequisite and `REQ-*` header convention.
+- [x] 4.3 Chore-lane check: existing lint/unit/BDD suites unchanged and green.
 
 ### Slice 5: Hook/CI Wiring & Integration (REQ-OSA-12, 16, 17)
 - [ ] 5.1 **BDD (Step 5.5-A)**: End-to-end scenario installing into a scratch `openspec init` project and running the check.

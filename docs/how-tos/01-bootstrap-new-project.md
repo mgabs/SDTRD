@@ -1,6 +1,8 @@
 # How-To: Bootstrap a Project with SDTRD
 
-This guide walks through initializing the SDTRD structure in any new or existing repository.
+This guide walks through installing SDTRD on an OpenSpec project.
+
+> **Prerequisites**: run `openspec init` first (OpenSpec ≥ 1.15.0 on `PATH`) and install `jq`. The installer exits non-zero and writes nothing otherwise. It is idempotent, sets `schema: sdtrd` in `openspec/config.yaml`, never overwrites an existing `.pre-commit-config.yaml`, and puts agent rules in `openspec/sdtrd/` so `openspec update` leaves them alone. The scaffold listing below describes the legacy layout; see `specs/WORKFLOW.md` §7 for the OpenSpec layout.
 
 ---
 

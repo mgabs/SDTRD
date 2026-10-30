@@ -40,3 +40,5 @@ Follow [specs/WORKFLOW.md](../../specs/WORKFLOW.md) and copy templates from [tem
    - **5.x-B**: Write failing unit tests (`Red`) tested locally, then implement minimal code (`Green`). Commit tests + code together. Line & branch coverage $\ge 95\%$.
    - **5.x-C**: Run mutation testing $\rightarrow$ achieve $100\%$ kill score on core logic (no exemptions: kill, delete dead code, or restructure equivalent mutants).
 7. **Gate 6 (Archive & Merge)**: Ensure all stream worktrees are merged, removed, and pruned (`git worktree prune`). Rebase onto `main`, re-verify rails, sync specs to `specs/living/` (safe overwrite), archive to `specs/archive/<id>-<slug>/`, merge `--ff-only`, and update `specs/ROADMAP.md` to `✅ Shipped`.
+
+**OpenSpec projects** (`openspec/` present, schema `sdtrd`): create changes with `openspec new change`, write Gate 2 as delta specs (`### Requirement: REQ-X-N name`, MUST/SHALL), run `openspec validate` after stream rebases, and replace the copy/move steps of Gate 6 with `openspec archive <change>`. Run `sdtrd-check` before committing. See `specs/WORKFLOW.md` §7.

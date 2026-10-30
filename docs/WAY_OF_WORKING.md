@@ -11,7 +11,7 @@ SDTRD transforms AI-assisted software delivery from speculative, prompt-driven c
 1. **`main` is strictly immutable to direct edits**: Zero code, specs, or docs land directly on `main`. Every commit lands through an isolated lane via `--ff-only`.
 2. **Code is a liability, not an asset**: The smallest diff that satisfies formal requirements and passes all rails wins.
 3. **No untested code exists**: Code does not exist until a test fails for its absence. Coverage ($\ge 95\%$) is insufficient without a **100% mutation kill score**.
-4. **Specs are evergreen living truth**: Specifications are full capability models, never partial deltas. They sync into `specs/living/` upon shipping.
+4. **Specs are evergreen living truth**: Specifications are full capability models, never partial deltas. They sync into `specs/living/` upon shipping. *(On OpenSpec projects, specs are OpenSpec delta specs archived with `openspec archive`; see `specs/WORKFLOW.md` §7.)*
 
 ```mermaid
 flowchart TD

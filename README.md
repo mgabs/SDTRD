@@ -84,7 +84,9 @@ sdtrd/
 │   └── sdtrd/
 │       └── SKILL.md          # Agent skill runbook
 ├── tests/
-│   └── test_init.sh          # Automated test suite for bin/sdtrd
+│   ├── test_installer.sh     # Installer tests (bin/sdtrd)
+│   ├── test_check.sh         # Gate/lane check tests (bin/sdtrd-check)
+│   └── test_schema.sh        # sdtrd schema tests
 ├── Makefile                  # Test runner (`make test`)
 └── plugin.json               # Agent plugin manifest
 ```
@@ -93,12 +95,13 @@ sdtrd/
 
 ## Quick Start
 
-### Initialize a Repository
+### Install on an OpenSpec Project
+Prerequisites: an existing `openspec init` project, OpenSpec ≥ 1.15.0 on `PATH`, and `jq` (for `sdtrd-check`).
 ```bash
-/path/to/sdtrd/bin/sdtrd [target-repo]
+/path/to/sdtrd/bin/sdtrd [init] [target-repo]
 ```
 
-Scaffolds `specs/{WORKFLOW.md,features/,bug-reports/,living/,templates/}`, sets up `.pre-commit-config.yaml`, and ensures `.worktrees/` is ignored in `.gitignore`.
+Copies the `sdtrd` schema to `openspec/schemas/sdtrd/`, sets `schema: sdtrd` in `openspec/config.yaml` (other keys preserved), installs the branch-protection hook, CI workflow, mutation templates, and agent rules (`openspec/sdtrd/`, which `openspec update` does not regenerate), keeps any existing `.pre-commit-config.yaml`, and ignores `.worktrees/`. Re-running is a no-op. Spec requirements use `### Requirement: REQ-<DOMAIN>-<N> <name>` headers in OpenSpec delta specs. Gate and lane check: `bin/sdtrd-check`. See `specs/WORKFLOW.md` §7.
 
 ### Documentation & Guides
 
