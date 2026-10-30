@@ -29,7 +29,7 @@ Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `sp
 | **W1.1** | Canonical Workflow Protocol | M | — | ✅ | `specs/WORKFLOW.md` | Language-agnostic Gates 0–6, Worktrees, Rails |
 | **W1.2** | Lifecycle Markdown Templates | S | W1.1 | ✅ | `templates/` | `research.md`, `proposal.md`, `spec.md`, `design.md`, `tasks.md`, `bug-report.md`, `roadmap.md` |
 | **W1.3** | Project Initializer Script | S | W1.2 | ✅ | `bin/spec-rails` | Scaffolds `specs/` and `.gitignore` idempotently |
-| **W1.4** | Automated Test Suite | S | W1.3 | ✅ | `tests/test_init.sh` | Shell assertions + `Makefile` runner |
+| **W1.4** | Automated Test Suite | S | W1.3 | ✅ | `tests/test_installer.sh` | Shell assertions + `Makefile` runner |
 
 ### Wave 2: CI & Review Harness Pairing
 
@@ -45,10 +45,10 @@ Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `sp
 | ID | Item | Effort | Depends on | Status | Spec / Feature Dir | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **W3.1** | OpenSpec Integration Review | M | W2.4 | ✅ | `openspec/changes/archive/2026-10-30-w3.1-openspec-addon/` | Gate 0 Go: Option A (`spec-rails` schema + thin installer); adopt OpenSpec delta specs and `openspec/` layout |
-| **W3.2** | `spec-rails` OpenSpec Schema & Templates | M | W3.1 | ⬜ | | `research` artifact, gate footers, slice-loop `apply.instruction` |
+| **W3.2** | `spec-rails` OpenSpec Schema & Templates | M | W3.1 | ✅ | | `research` artifact, gate footers, slice-loop `apply.instruction` |
 | **W3.3** | Gate-to-OpenSpec Mapping | M | W3.2 | ⬜ | | `REQ-*`/`NFR-*` convention in deltas; Gate 6 reduced to rails + `openspec archive` |
-| **W3.4** | Installer CLI | M | W3.2 | ⬜ | | Idempotent POSIX wiring into existing `openspec/` project |
-| **W3.5** | Gate Enforcement | M | W3.2, W3.4 | ⬜ | | CI/pre-commit Review Gate and lane checks via `openspec status --json` |
+| **W3.4** | Installer CLI | M | W3.2 | ✅ | | Idempotent POSIX wiring into existing `openspec/` project |
+| **W3.5** | Gate Enforcement | M | W3.2, W3.4 | ✅ | | CI/pre-commit Review Gate and lane checks via `openspec status --json` |
 | **W3.6** | Worktree Streams vs Delta Specs | S | W3.3 | ⬜ | | Rebase + `openspec validate` discipline |
 | **W3.7** | Bugfix Lane & Roadmap Mapping | S | W3.3 | ⬜ | | B1–B3 representation; `ROADMAP.md` vs OpenSpec initiatives |
 | **W3.8** | Self-Migration to Addon Layout | L | W3.2–W3.5 | ✅ | | `specs/` → `openspec/`; docs, skill, rules, tests |

@@ -1,0 +1,59 @@
+#!/usr/bin/env sh
+# Runs the CI "Audit Spec-to-Code Mapping" step extracted from templates/spec-rails-ci.yml
+# against throwaway git repos (REQ-OSA-21).
+set -eu
+
+REPO_ROOT="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
+CI="${SPEC_RAILS_CI_TEMPLATE:-$REPO_ROOT/templates/spec-rails-ci.yml}"
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+
+FAILED=0
+PASSED=0
+
+awk '/- name: Audit Spec-to-Code Mapping/ { a = 1; next }
+     a && /run: \|/ { r = 1; next }
+     r && /- name:/ { exit }
+     r { sub(/^ {10}/, ""); print }' "$CI" | sed 's/\${{ github.base_ref }}/main/' > "$TMP/audit.sh"
+
+[ -s "$TMP/audit.sh" ] || { echo "FAIL: audit step not found in $CI"; exit 1; }
+
+# audit_case NAME EXPECTED_EXIT HEAD_REF FILE...
+audit_case() {
+  name="$1"; expected="$2"; ref="$3"; shift 3
+  d="$TMP/repo"
+  rm -rf "$d"
+  git init -q "$d"
+  (
+    cd "$d"
+    git config user.email t@t; git config user.name t
+    git commit -q --allow-empty -m base
+    git update-ref refs/remotes/origin/main HEAD
+    for f in "$@"; do mkdir -p "$(dirname "$f")"; echo x > "$f"; done
+    git add -A; git commit -q -m change
+  )
+  rc=0
+  out="$(cd "$d" && HEAD_REF="$ref" sh "$TMP/audit.sh" 2>&1)" || rc=$?
+  if [ "$rc" != "$expected" ]; then
+    echo "FAIL: $name (expected exit $expected, got $rc)"
+    FAILED=$((FAILED + 1))
+  else
+    PASSED=$((PASSED + 1))
+  fi
+  LAST_OUT="$out"
+}
+
+audit_case "openspec change passes" 0 feat/x src/app.sh openspec/changes/w1-1-x/proposal.md
+audit_case "living spec passes" 0 feat/x src/app.sh openspec/specs/core/spec.md
+audit_case "bug report passes" 0 fix/x src/app.sh specs/bug-reports/2026-01-01-x.md
+audit_case "code without spec fails" 1 feat/x src/app.sh
+case "$LAST_OUT" in
+  *src/app.sh*) PASSED=$((PASSED + 1)) ;;
+  *) echo "FAIL: failure output lists src/app.sh"; FAILED=$((FAILED + 1)) ;;
+esac
+audit_case "legacy specs/features path fails" 1 feat/x src/app.sh specs/features/x/spec.md
+audit_case "openspec yaml alone is not code" 0 feat/x openspec/changes/w1-1-x/.openspec.yaml
+audit_case "chore lane exempt" 0 chore/tidy src/app.sh
+
+echo "ci audit: $PASSED passed, $FAILED failed"
+[ "$FAILED" -eq 0 ]

@@ -25,11 +25,11 @@ jobs:
           esac
 
           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
-          CODE_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E '^(specs/|docs/|\.github/|.*\.md$)' || true)
-          SPEC_CHANGES=$(echo "$CHANGED_FILES" | grep -E '^specs/(features|archive|living|bug-reports)/' || true)
+          CODE_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E '^(specs/|openspec/|docs/|\.github/|.*\.md$)' || true)
+          SPEC_CHANGES=$(echo "$CHANGED_FILES" | grep -E '^(openspec/(changes|specs)/|specs/bug-reports/)' || true)
 
           if [ -n "$CODE_CHANGES" ] && [ -z "$SPEC_CHANGES" ]; then
-            echo "ERROR: Code modified without corresponding feature spec or bug report in specs/"
+            echo "ERROR: Code modified without an openspec/ change or specs/bug-reports/ entry"
             echo "Modified files:"
             echo "$CODE_CHANGES"
             exit 1
