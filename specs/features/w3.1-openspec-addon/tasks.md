@@ -40,15 +40,15 @@ Shared-file protocol (Rule 3.7): both streams touch `Makefile`, `tests/bdd/test_
 - [x] 1.5 **Mutation (manual checklist, per Gate 3)**: Flip each DAG edge/footer expectation and confirm a test fails.
 
 ### Slice 2 [Stream A]: Installer (REQ-OSA-11–15; NFR-OSA-1, 2, 4; Scenarios 4.1–4.4) (`.worktrees/w3.1-installer`)
-- [ ] 2.1 **BDD (Step 5.2-A)**: Scenarios 4.1–4.4 and edge cases 1–3.
-- [ ] 2.2 **Review Gate 5.2**: Human sign-off on BDD scenarios.
+- [x] 2.1 **BDD (Step 5.2-A)**: Scenarios 4.1–4.4 and edge cases 1–3.
+- [x] 2.2 **Review Gate 5.2**: Human sign-off on BDD scenarios.
 - [ ] 2.3 **Unit Tests (Red)**: `version_ge`, `set_schema_line`, prerequisite failures, idempotence, existing `.pre-commit-config.yaml`/hook preserved.
 - [ ] 2.4 **Implementation (Green)**: Rework `bin/sdtrd` to wire into `openspec/`; coverage ≥ 95% line/branch.
 - [ ] 2.5 **Mutation (manual checklist)**: Boundary flips (`1.14.9`/`1.15.0`/`1.15.1`, present/absent `schema:` line).
 
 ### Slice 3 [Stream B]: Gate & Lane Check (REQ-OSA-16–18; NFR-OSA-1, 3, 4; Scenarios 4.6–4.8) (`.worktrees/w3.1-check`)
-- [ ] 3.1 **BDD (Step 5.3-A)**: Scenarios 4.6–4.8 and edge cases 4–5.
-- [ ] 3.2 **Review Gate 5.3**: Human sign-off on BDD scenarios.
+- [x] 3.1 **BDD (Step 5.3-A)**: Scenarios 4.6–4.8 and edge cases 4–5.
+- [x] 3.2 **Review Gate 5.3**: Human sign-off on BDD scenarios.
 - [ ] 3.3 **Unit Tests (Red)**: `gate_ticked`, `violations`, branch guard, empty changes, malformed JSON, multi-violation output, stub `openspec`.
 - [ ] 3.4 **Implementation (Green)**: `bin/sdtrd-check`; coverage ≥ 95% line/branch.
 - [ ] 3.5 **Mutation (manual checklist)**: Ticked/unticked, missing section, `main`/`master`, exit-code flips.
