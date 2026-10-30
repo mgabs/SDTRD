@@ -41,4 +41,4 @@ Follow [specs/WORKFLOW.md](../../specs/WORKFLOW.md). Create a change with `opens
    - **5.x-C**: Run mutation testing $\rightarrow$ achieve $100\%$ kill score on core logic (no exemptions: kill, delete dead code, or restructure equivalent mutants).
 7. **Gate 6 (Archive & Merge)**: Ensure all stream worktrees are merged, removed, and pruned (`git worktree prune`). Rebase onto `main`, re-verify rails, run `openspec validate <change>` then `openspec archive <change> --yes` (syncs deltas into `openspec/specs/` and archives the change), merge `--ff-only`, and update `specs/ROADMAP.md` to `✅ Shipped`.
 
-Create changes with `openspec new change`, run `openspec validate` after stream rebases, and run `spec-rails-check` before committing. See `specs/WORKFLOW.md` §7.
+Never tick a Review Gate box yourself. Run `openspec validate` after stream rebases, and run `spec-rails-check` before committing. See `specs/WORKFLOW.md` §7.
