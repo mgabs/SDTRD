@@ -8,7 +8,7 @@ Baseline: `main` · Status: Active
 
 ```mermaid
 flowchart LR
-    W1[Wave 1: Protocol & Rails] --> W2[Wave 2: CI & Review Harness Pairing]
+    W1[Wave 1: Protocol & Rails] --> W2[Wave 2: CI & Review Harness Pairing] --> W3[Wave 3: OpenSpec Addon]
 ```
 
 ---
@@ -39,6 +39,14 @@ Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `sp
 | **W2.2** | Reusable GitHub CI Workflow | S | W1.2 | ✅ | `templates/sdtrd-ci.yml` | Spec-to-code audit + testing rail verification |
 | **W2.3** | LGTM Review Pairing Specs | M | W1.1 | ✅ | `docs/WIKI.md` | Line-anchored `#ref` steering and anti-fraud guardrails |
 | **W2.4** | Chore Lane & Contradiction Pruning | S | W1.1, W2.2 | ✅ | `specs/WORKFLOW.md` | Red-commit policy, chore lane, full-copy spec rule |
+
+### Wave 3: OpenSpec Addon
+
+| ID | Item | Effort | Depends on | Status | Spec / Feature Dir | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **W3.1** | OpenSpec Integration Review | M | W2.4 | 🔬 | `specs/features/w3.1-openspec-addon/` | Gap analysis of SDTRD vs OpenSpec 1.15; form: schema bundle + thin installer CLI; adopt OpenSpec delta specs and `openspec/` layout |
+
+Further Wave 3 items are added after the W3.1 Gate 0 decision.
 
 ---
 
