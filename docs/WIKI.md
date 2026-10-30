@@ -111,6 +111,8 @@ When a feature contains orthogonal tasks (decoupled modules, distinct endpoints,
 2. **Unit Red-Green-Refactor**: Fine-grained assertions on all code paths, edge cases, and boundary values.
 3. **Mutation Testing**: Code mutating engines (e.g. `cargo-mutants`, `mutmut`, `stryker`) generate mutations (flipping conditionals, replacing arithmetic, deleting statements). Every mutant MUST be caught and killed by tests.
 
+Spec-Rails tests itself with the same rails: `make test` includes a fresh-repo end-to-end test (`tests/test_e2e.sh`) that runs the real OpenSpec CLI plus the installer in a throwaway repo and checks that the `spec-rails` schema resolves and the hook blocks an unticked gate. The lint step also fails on broken doc links, manual template-copy instructions and unused shell helpers.
+
 ### 4.2 Surviving Mutant Protocol
 When a mutant survives:
 1. **Case A: Missing Assertion**: The test suite failed to assert a critical boundary. Fix: Add a targeted assertion.
