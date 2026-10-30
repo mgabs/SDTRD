@@ -71,6 +71,6 @@ Shared-file protocol (Rule 3.7): both streams touch `Makefile`, `tests/bdd/test_
 - [x] Merge completed stream worktrees (rebase onto feature branch, re-verify, `git merge --ff-only`), remove worktrees, and prune (`git worktree prune`). Verify `git worktree list` shows only the repository root.
 - [x] Full test suite passes with ≥ 95% line and branch coverage.
 - [x] Full mutation checklist re-run on all pure functions (no tool for POSIX `sh`; deviation approved at Gate 3).
-- [ ] Sync spec to `specs/living/openspec-addon/spec.md` and archive with the legacy Gate 6 steps (this feature predates the migration).
+- [x] Sync spec to `specs/living/openspec-addon/spec.md` and archive with the legacy Gate 6 steps (this feature predates the migration).
 - [x] **Gate 4 Approval**: Tasks breakdown approved by human before writing test code.
-- [ ] **Gate 6 Approval**: Final sync and archive sign-off.
+- [x] **Gate 6 Approval**: Final sync and archive sign-off.
