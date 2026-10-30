@@ -41,4 +41,4 @@ SDTRD ships its own `specs/{features,living,archive}` lifecycle, full-copy specs
 ---
 
 ## Review Gate
-- [ ] **Gate 1 Approval**: Proposal reviewed and approved by human before drafting specs.
+- [x] **Gate 1 Approval**: Proposal reviewed and approved by human before drafting specs.
