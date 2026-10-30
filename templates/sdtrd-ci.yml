@@ -36,6 +36,13 @@ jobs:
           fi
           echo "Spec-to-code audit passed."
 
+      - name: Gate & Lane Check
+        run: |
+          if [ -x openspec/sdtrd/sdtrd-check ]; then
+            npm install -g @fission-ai/openspec
+            sh openspec/sdtrd/sdtrd-check
+          fi
+
       - name: Set up Pre-Commit
         run: |
           pip install pre-commit

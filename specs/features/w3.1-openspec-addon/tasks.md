@@ -59,18 +59,18 @@ Shared-file protocol (Rule 3.7): both streams touch `Makefile`, `tests/bdd/test_
 - [x] 4.3 Chore-lane check: existing lint/unit/BDD suites unchanged and green.
 
 ### Slice 5: Hook/CI Wiring & Integration (REQ-OSA-12, 16, 17)
-- [ ] 5.1 **BDD (Step 5.5-A)**: End-to-end scenario installing into a scratch `openspec init` project and running the check.
-- [ ] 5.2 **Review Gate 5.5**: Human sign-off on BDD scenarios.
-- [ ] 5.3 **Unit Tests (Red)** then **Implementation (Green)**: Extend hook and `templates/sdtrd-ci.yml` to call `sdtrd-check`; keep existing branch-protection and LGTM directive behavior.
-- [ ] 5.4 **Mutation (manual checklist)** on hook wiring conditions.
+- [x] 5.1 **BDD (Step 5.5-A)**: End-to-end scenario installing into a scratch `openspec init` project and running the check.
+- [x] 5.2 **Review Gate 5.5**: Human sign-off on BDD scenarios.
+- [x] 5.3 **Unit Tests (Red)** then **Implementation (Green)**: Extend hook and `templates/sdtrd-ci.yml` to call `sdtrd-check`; keep existing branch-protection and LGTM directive behavior.
+- [x] 5.4 **Mutation (manual checklist)** on hook wiring conditions.
 
 ---
 
 ## 4. Integration, Rebase & Gate 6 Checklist
 
 - [x] Merge completed stream worktrees (rebase onto feature branch, re-verify, `git merge --ff-only`), remove worktrees, and prune (`git worktree prune`). Verify `git worktree list` shows only the repository root.
-- [ ] Full test suite passes with ≥ 95% line and branch coverage.
-- [ ] Full mutation checklist re-run on all pure functions (no tool for POSIX `sh`; deviation approved at Gate 3).
+- [x] Full test suite passes with ≥ 95% line and branch coverage.
+- [x] Full mutation checklist re-run on all pure functions (no tool for POSIX `sh`; deviation approved at Gate 3).
 - [ ] Sync spec to `specs/living/openspec-addon/spec.md` and archive with the legacy Gate 6 steps (this feature predates the migration).
 - [x] **Gate 4 Approval**: Tasks breakdown approved by human before writing test code.
 - [ ] **Gate 6 Approval**: Final sync and archive sign-off.

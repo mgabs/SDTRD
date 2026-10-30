@@ -246,6 +246,34 @@ printf '#!/bin/sh\n# user hook\n' > "$P/.git/hooks/pre-commit"
 run_install "$P"
 assert_eq "# user hook" "$(sed -n 2p "$P/.git/hooks/pre-commit")" "existing hook preserved"
 
+# ---- Slice 5: hook and CI wiring (REQ-OSA-12, 16, 17) ----
+P="$(newproj)"
+git init -q -b main "$P"
+run_install "$P"
+assert_file_exists "$P/openspec/sdtrd/sdtrd-check" "sdtrd-check installed"
+assert_eq "yes" "$([ -x "$P/openspec/sdtrd/sdtrd-check" ] && echo yes || echo no)" "sdtrd-check executable"
+assert_eq "" "$(cmp "$REPO_ROOT/bin/sdtrd-check" "$P/openspec/sdtrd/sdtrd-check" 2>&1)" "sdtrd-check identical to source"
+assert_contains "openspec/sdtrd/sdtrd-check" "$(cat "$P/.git/hooks/pre-commit")" "hook invokes sdtrd-check"
+assert_contains "openspec/sdtrd/sdtrd-check" "$(cat "$P/.github/workflows/sdtrd-ci.yml")" "CI runs sdtrd-check"
+assert_contains "make test" "$(cat "$P/.github/workflows/sdtrd-ci.yml")" "CI still runs make test"
+assert_contains "Audit Spec-to-Code Mapping" "$(cat "$P/.github/workflows/sdtrd-ci.yml")" "CI keeps spec-to-code audit"
+
+# hook blocks on a failing check, passes when check passes (stub check on a feature branch)
+(cd "$P" && git checkout -q -b feat/x)
+printf '#!/bin/sh\necho "stub gate violation" >&2\nexit 1\n' > "$P/openspec/sdtrd/sdtrd-check"
+HOOK_RC=0
+HOOK_OUT="$(cd "$P" && sh .git/hooks/pre-commit 2>&1)" || HOOK_RC=$?
+assert_eq "1" "$HOOK_RC" "hook fails when sdtrd-check fails"
+assert_contains "stub gate violation" "$HOOK_OUT" "hook surfaces sdtrd-check output"
+printf '#!/bin/sh\nexit 0\n' > "$P/openspec/sdtrd/sdtrd-check"
+HOOK_RC=0
+(cd "$P" && sh .git/hooks/pre-commit >/dev/null 2>&1) || HOOK_RC=$?
+assert_eq "0" "$HOOK_RC" "hook passes when sdtrd-check passes"
+rm "$P/openspec/sdtrd/sdtrd-check"
+HOOK_RC=0
+(cd "$P" && sh .git/hooks/pre-commit >/dev/null 2>&1) || HOOK_RC=$?
+assert_eq "0" "$HOOK_RC" "hook skips check when sdtrd-check absent"
+
 echo ""
 echo "=== Test Summary ==="
 echo "Passed: $PASSED"

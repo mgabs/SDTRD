@@ -52,6 +52,11 @@ if [ -d ".lgtm/reviews" ]; then
         exit 1
     fi
 fi
+
+# SDTRD Gate & Lane Check (installed by sdtrd)
+if [ -x "openspec/sdtrd/sdtrd-check" ]; then
+    sh openspec/sdtrd/sdtrd-check || exit 1
+fi
 EOF
   chmod +x "$hook"
 }
@@ -103,6 +108,7 @@ main() {
     put_file "$m" "$target/openspec/sdtrd/mutation/$(basename -- "$m")"
   done
   put_file "$root/rules/AGENTS.md" "$target/openspec/sdtrd/AGENTS.md"
+  put_file "$root/bin/sdtrd-check" "$target/openspec/sdtrd/sdtrd-check"
 
   if [ -f "$target/.gitignore" ]; then
     grep -qxF ".worktrees/" "$target/.gitignore" || printf "\n.worktrees/\n" >> "$target/.gitignore"
