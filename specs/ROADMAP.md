@@ -52,6 +52,9 @@ Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `sp
 | **W3.6** | Worktree Streams vs Delta Specs | S | W3.3 | ✅ | `specs/WORKFLOW.md` §7 | Rebase + `openspec validate` discipline |
 | **W3.7** | Bugfix Lane & Roadmap Mapping | S | W3.3 | ✅ | `specs/WORKFLOW.md` §7 | B1–B3 representation; `ROADMAP.md` vs OpenSpec initiatives |
 | **W3.8** | Self-Migration to Addon Layout | L | W3.2–W3.5 | ✅ | | `specs/` → `openspec/`; docs, skill, rules, tests |
+| **W3.9** | Addon Hygiene | S | W3.8 | ✅ | `openspec/changes/archive/2026-10-30-w3-9-addon-hygiene/` | CI audit layout, self-copy sync (REQ-OSA-21, 22) |
+| **W3.10** | Cleanup & Docs | S | W3.9 | ✅ | `openspec/changes/archive/2026-10-30-w3-10-cleanup-docs/` | Dead code removal, docs lint, OpenSpec-native docs (REQ-OSA-23, 24) |
+| **W3.11** | Fresh-Repo End-to-End | S | W3.10 | ✅ | `openspec/changes/archive/2026-10-30-w3-11-fresh-repo-e2e/` | Real-CLI test in a new repo (REQ-OSA-25) |
 
 ---
 
