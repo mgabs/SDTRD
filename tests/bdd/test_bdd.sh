@@ -77,7 +77,8 @@ fi
 
 # Scenarios below simulate the legacy specs/ lifecycle without the installer
 mkdir -p openspec/changes openspec/specs openspec/changes/archive specs/bug-reports specs/templates
-cp "$SPEC_RAILS_ROOT/templates/"*.md specs/templates/
+cp "$SPEC_RAILS_ROOT/schemas/spec-rails/templates/"*.md specs/templates/
+cp "$SPEC_RAILS_ROOT/templates/bug-report.md" specs/templates/
 cp "$SPEC_RAILS_ROOT/templates/roadmap.md" specs/ROADMAP.md
 rm -rf "$STUB_DIR"
 

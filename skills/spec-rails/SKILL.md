@@ -28,13 +28,13 @@ Follow [specs/WORKFLOW.md](../../specs/WORKFLOW.md) and copy templates from [tem
 
 ## 2. Gate Execution Checklist
 
-1. **Gate 0 (Research & Tradeoffs)**: Copy [templates/research.md](../../templates/research.md) $\rightarrow$ `openspec/changes/<id>-<slug>/research.md`. Present 2–3 options, tradeoffs, and breaking changes. Stop for human developer decision.
+1. **Gate 0 (Research & Tradeoffs)**: Copy [schemas/spec-rails/templates/research.md](../../schemas/spec-rails/templates/research.md) $\rightarrow$ `openspec/changes/<id>-<slug>/research.md`. Present 2–3 options, tradeoffs, and breaking changes. Stop for human developer decision.
    - If **Go**: Update `specs/ROADMAP.md` to `🚀 In Progress` via `chore/roadmap-<id>`.
    - If **No-Go**: Commit `research.md` to `openspec/changes/archive/<id>-<slug>/`, mark `❌ Dropped` in `specs/ROADMAP.md` with rationale via `chore/roadmap-<id>`, and prune feature branch.
-2. **Gate 1 (Proposal)**: Copy [templates/proposal.md](../../templates/proposal.md) $\rightarrow$ `openspec/changes/<id>-<slug>/proposal.md` based on chosen option. Stop for human review.
+2. **Gate 1 (Proposal)**: Copy [schemas/spec-rails/templates/proposal.md](../../schemas/spec-rails/templates/proposal.md) $\rightarrow$ `openspec/changes/<id>-<slug>/proposal.md` based on chosen option. Stop for human review.
 3. **Gate 2 (Specs)**: OpenSpec delta specs (`### Requirement: REQ-X-N name`, MUST/SHALL, at least one scenario). MODIFIED/REMOVED repeat the existing header exactly. Stop for human review.
-4. **Gate 3 (Design)**: Copy [templates/design.md](../../templates/design.md) $\rightarrow$ `openspec/changes/<id>-<slug>/design.md`. Stop for human review.
-5. **Gate 4 (Tasks)**: Copy [templates/tasks.md](../../templates/tasks.md) $\rightarrow$ `openspec/changes/<id>-<slug>/tasks.md` with DAG and worktree streams. Stop for human review.
+4. **Gate 3 (Design)**: Copy [schemas/spec-rails/templates/design.md](../../schemas/spec-rails/templates/design.md) $\rightarrow$ `openspec/changes/<id>-<slug>/design.md`. Stop for human review.
+5. **Gate 4 (Tasks)**: Copy [schemas/spec-rails/templates/tasks.md](../../schemas/spec-rails/templates/tasks.md) $\rightarrow$ `openspec/changes/<id>-<slug>/tasks.md` with DAG and worktree streams. Stop for human review.
 6. **Apply (Gate 5.x)**: Per vertical slice:
    - **5.x-A**: Write BDD `.feature` scenarios $\rightarrow$ **Stop for Gate 5.x human approval**.
    - **5.x-B**: Write failing unit tests (`Red`) tested locally, then implement minimal code (`Green`). Commit tests + code together. Line & branch coverage $\ge 95\%$.

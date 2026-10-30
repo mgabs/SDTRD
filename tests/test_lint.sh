@@ -28,7 +28,7 @@ for script in "$REPO_ROOT/bin/spec-rails" "$REPO_ROOT/tests/test_installer.sh" "
 done
 
 # 2. Template integrity checks
-for template in roadmap.md research.md proposal.md spec.md design.md tasks.md bug-report.md spec-rails-ci.yml .pre-commit-config.yaml mutation/cargo-mutants.toml mutation/stryker.config.json mutation/mutmut.ini; do
+for template in roadmap.md bug-report.md spec-rails-ci.yml .pre-commit-config.yaml mutation/cargo-mutants.toml mutation/stryker.config.json mutation/mutmut.ini; do
   path="$REPO_ROOT/templates/$template"
   if [ -s "$path" ]; then
     pass "Template present and non-empty: $template"

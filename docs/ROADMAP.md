@@ -1,7 +1,7 @@
-# Spec-Rails Roadmap: Pure Git, Markdown & CI Rails
+# Spec-Rails Roadmap: OpenSpec Addon Rails
 
-Spec-Rails follows strict YAGNI: **no custom CLI binaries or command wrappers**.
-All validation, synchronization, and rails are executed through standard Git, markdown conventions, AI agent prompt rules, and CI workflows.
+Spec-Rails follows strict YAGNI: an OpenSpec schema plus a thin POSIX-sh installer (`bin/spec-rails`) and check (`bin/spec-rails-check`).
+Validation and archival use `openspec`, standard Git, agent rules, and CI. Delivery status lives in `specs/ROADMAP.md`.
 
 ---
 
@@ -13,9 +13,9 @@ flowchart LR
 
 ---
 
-## 1. Agent-Enforced Verification (No CLI Needed)
+## 1. Agent-Enforced Verification
 
-The AI coding agent natively reads markdown, validates sections, and moves files.
+The AI coding agent validates gate artifacts; `spec-rails-check` enforces gates and lanes mechanically.
 
 - **Gate Validation**: Before presenting a gate for human sign-off, agent verifies:
   - Gate 1: `proposal.md` has Intent, Problem, In-Scope, Out-of-Scope (YAGNI), Assumptions.
@@ -32,7 +32,7 @@ The AI coding agent natively reads markdown, validates sections, and moves files
 
 ## 2. Reusable GitHub CI Workflow (`templates/spec-rails-ci.yml`)
 
-A pure GitHub Actions workflow with zero custom binaries:
+A GitHub Actions workflow installed to `.github/workflows/spec-rails-ci.yml`:
 
 1. **Spec-to-Code Audit**:
    - Uses `git diff --name-only origin/main...HEAD`

@@ -58,36 +58,17 @@ Spec-Rails pairs natively with [mgabs/lgtm](https://github.com/mgabs/lgtm), a ke
 ```text
 spec-rails/
 ├── bin/
-│   └── spec-rails                 # Initialization script (`spec-rails [target-repo]`)
-├── docs/
-│   ├── WAY_OF_WORKING.md     # Detailed Way of Working (WoW) engineering handbook
-│   ├── WIKI.md               # Architectural wiki, gate matrix & testing rails
-│   └── how-tos/
-│       ├── 01-bootstrap-new-project.md
-│       ├── 02-drive-feature-lifecycle.md
-│       ├── 03-parallel-worktrees-multi-agent.md
-│       ├── 04-fast-track-bugfix.md
-│       └── 05-configure-ai-agents.md
-├── specs/
-│   └── WORKFLOW.md           # Canonical stack-agnostic Spec-Rails workflow specification
-├── templates/
-│   ├── research.md           # Gate 0: Research & Tradeoffs template
-│   ├── proposal.md           # Gate 1: Feature Proposal template
-│   ├── spec.md               # Gate 2: Capability Specification template
-│   ├── design.md             # Gate 3: Architecture & Design template
-│   ├── tasks.md              # Gate 4: DAG & Worktree Stream Tasks template
-│   ├── bug-report.md         # Gate B1: Fast-Track Bug Report template
-│   └── .pre-commit-config.yaml
-├── rules/
-│   └── AGENTS.md             # Always-on agent guardrails
-├── skills/
-│   └── spec-rails/
-│       └── SKILL.md          # Agent skill runbook
-├── tests/
-│   ├── test_installer.sh     # Installer tests (bin/spec-rails)
-│   ├── test_check.sh         # Gate/lane check tests (bin/spec-rails-check)
-│   └── test_schema.sh        # spec-rails schema tests
-├── Makefile                  # Test runner (`make test`)
+│   ├── spec-rails            # Installer (`spec-rails [init] [target-repo]`)
+│   └── spec-rails-check      # Gate & lane check (hook + CI)
+├── schemas/spec-rails/       # OpenSpec schema + artifact templates (copied into target repos)
+├── templates/                # spec-rails-ci.yml, bug-report.md, roadmap.md, mutation configs, pre-commit config
+├── rules/AGENTS.md           # Always-on agent guardrails
+├── skills/spec-rails/SKILL.md# Agent skill runbook
+├── specs/                    # WORKFLOW.md (canonical protocol), ROADMAP.md, bug-reports/
+├── openspec/                 # This repo's own OpenSpec layout (main specs, archived changes)
+├── docs/                     # WAY_OF_WORKING, WIKI, ROADMAP, how-tos/01–05
+├── tests/                    # installer, check, schema, lint suites + bdd/
+├── Makefile                  # `make test`
 └── plugin.json               # Agent plugin manifest
 ```
 

@@ -133,7 +133,7 @@ OUT=""
 ERR=""
 run_check() {
   RC=0
-  (cd "$WORK" && PATH="$SCR/stub:$PATH" sh "$BIN" >"$WORK/out" 2>"$WORK/err") || RC=$?
+  (cd "$WORK" && GIT_CEILING_DIRECTORIES="$SCR" PATH="$SCR/stub:$PATH" sh "$BIN" >"$WORK/out" 2>"$WORK/err") || RC=$?
   OUT=$(cat "$WORK/out")
   ERR=$(cat "$WORK/err")
 }
