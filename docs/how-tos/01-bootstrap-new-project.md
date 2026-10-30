@@ -40,6 +40,8 @@ your-project/
 
 Optional: copy `templates/roadmap.md` from the spec-rails repo to `specs/ROADMAP.md` if you track delivery status. Create changes afterwards with `openspec new change <id>-<slug>` (see How-To 2).
 
+**Try it in a new repo**: [tests/test_e2e.sh](../../tests/test_e2e.sh) does steps 1–2 in a throwaway repo with the real OpenSpec CLI (`openspec init`, the installer, `openspec new change`) and checks that the `spec-rails` schema resolves and that the hook blocks a commit while an upstream Review Gate is unticked. Run it with `make test-e2e`.
+
 ---
 
 ## 3. Install Pre-Commit Hooks
