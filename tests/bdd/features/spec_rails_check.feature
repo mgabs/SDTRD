@@ -1,5 +1,5 @@
-Feature: sdtrd gate and lane check
-  As a team using the sdtrd schema
+Feature: spec-rails gate and lane check
+  As a team using the spec-rails schema
   We want a check runnable from pre-commit and CI
   So that artifacts cannot advance past an unticked human gate or land on main.
 

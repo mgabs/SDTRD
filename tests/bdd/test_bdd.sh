@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 set -eu
 
-SDTRD_ROOT="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
-BIN="$SDTRD_ROOT/bin/sdtrd"
+SPEC_RAILS_ROOT="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
+BIN="$SPEC_RAILS_ROOT/bin/spec-rails"
 
 PASSED=0
 FAILED=0
@@ -38,7 +38,7 @@ echo "Running BDD Acceptance Tests: specs/WORKFLOW.md Lifecycle"
 echo "=========================================================="
 
 # Setup scratch test repo
-TEST_DIR="$(mktemp -d /tmp/sdtrd-bdd-XXXXXX)"
+TEST_DIR="$(mktemp -d /tmp/spec-rails-bdd-XXXXXX)"
 trap 'rm -rf "$TEST_DIR"' EXIT
 
 git init -q -b main "$TEST_DIR"
@@ -52,21 +52,21 @@ git add README.md
 git commit -q -m "initial commit"
 
 echo ""
-echo "Scenario 1: Bootstrap an OpenSpec repository with SDTRD wiring"
+echo "Scenario 1: Bootstrap an OpenSpec repository with Spec-Rails wiring"
 STUB_DIR="$TEST_DIR/.stub"
 mkdir -p "$STUB_DIR" openspec
 printf '#!/bin/sh\necho 1.15.0\n' > "$STUB_DIR/openspec"
 chmod +x "$STUB_DIR/openspec"
 PATH="$STUB_DIR:$PATH" sh "$BIN" . >/dev/null
 
-assert_file "openspec/schemas/sdtrd/schema.yaml" "openspec/schemas/sdtrd/schema.yaml exists"
-assert_file "openspec/sdtrd/AGENTS.md" "SDTRD agent rules installed"
-assert_file ".github/workflows/sdtrd-ci.yml" "CI workflow installed"
+assert_file "openspec/schemas/spec-rails/schema.yaml" "openspec/schemas/spec-rails/schema.yaml exists"
+assert_file "openspec/spec-rails/AGENTS.md" "Spec-Rails agent rules installed"
+assert_file ".github/workflows/spec-rails-ci.yml" "CI workflow installed"
 assert_file ".pre-commit-config.yaml" ".pre-commit-config.yaml exists"
-if grep -qx "schema: sdtrd" openspec/config.yaml; then
-  step_pass "openspec/config.yaml selects schema sdtrd"
+if grep -qx "schema: spec-rails" openspec/config.yaml; then
+  step_pass "openspec/config.yaml selects schema spec-rails"
 else
-  step_fail "openspec/config.yaml selects schema sdtrd" "schema line missing"
+  step_fail "openspec/config.yaml selects schema spec-rails" "schema line missing"
 fi
 
 if grep -qxF ".worktrees/" .gitignore; then
@@ -77,16 +77,16 @@ fi
 
 # Scenarios below simulate the legacy specs/ lifecycle without the installer
 mkdir -p specs/features specs/living specs/archive specs/bug-reports specs/templates
-cp "$SDTRD_ROOT/templates/"*.md specs/templates/
-cp "$SDTRD_ROOT/templates/roadmap.md" specs/ROADMAP.md
+cp "$SPEC_RAILS_ROOT/templates/"*.md specs/templates/
+cp "$SPEC_RAILS_ROOT/templates/roadmap.md" specs/ROADMAP.md
 rm -rf "$STUB_DIR"
 
-git checkout -q -b chore/bootstrap-sdtrd
+git checkout -q -b chore/bootstrap-spec-rails
 git add .
-git commit -q -m "chore: bootstrap SDTRD"
+git commit -q -m "chore: bootstrap Spec-Rails"
 git checkout -q main
-git merge -q --ff-only chore/bootstrap-sdtrd
-git branch -q -d chore/bootstrap-sdtrd
+git merge -q --ff-only chore/bootstrap-spec-rails
+git branch -q -d chore/bootstrap-spec-rails
 
 echo ""
 echo "Scenario 2: Feature Gate 0 Go decision advances to Proposal and preserves living specs"

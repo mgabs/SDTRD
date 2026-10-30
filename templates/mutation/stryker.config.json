@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/api/schema/stryker-schema.json",
-  "_comment": "SDTRD Mutation Testing Rail for JS/TS (Stryker). Target: 100% kill score.",
+  "_comment": "Spec-Rails Mutation Testing Rail for JS/TS (Stryker). Target: 100% kill score.",
   "mutate": [
     "src/**/*.ts",
     "!src/**/*.spec.ts",

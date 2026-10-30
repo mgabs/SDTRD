@@ -1,4 +1,4 @@
-Feature: sdtrd end-to-end in an OpenSpec project
+Feature: spec-rails end-to-end in an OpenSpec project
   As a team running OpenSpec
   We want the installed hook and CI to run the gate and lane check
   So that unapproved gates and direct commits to main are blocked automatically.
@@ -6,7 +6,7 @@ Feature: sdtrd end-to-end in an OpenSpec project
   Scenario: Install then check in a scratch openspec project (REQ-OSA-12, 16, 17)
     Given a scratch git repo with "openspec/" and OpenSpec >= 1.15.0
     When the installer runs
-    Then "openspec/sdtrd/sdtrd-check" is installed and executable
+    Then "openspec/spec-rails/spec-rails-check" is installed and executable
     And the git pre-commit hook invokes it when present
 
   Scenario: Hook blocks an unticked gate (REQ-OSA-16)
@@ -21,8 +21,8 @@ Feature: sdtrd end-to-end in an OpenSpec project
     Then it exits 0
 
   Scenario: CI workflow runs the check (REQ-OSA-16)
-    Given the installed ".github/workflows/sdtrd-ci.yml"
-    Then it contains a step that runs "sdtrd-check"
+    Given the installed ".github/workflows/spec-rails-ci.yml"
+    Then it contains a step that runs "spec-rails-check"
     And the existing spec-to-code audit step and "make test" step are still present
 
   Scenario: Existing hook behaviour preserved (REQ-OSA-12)

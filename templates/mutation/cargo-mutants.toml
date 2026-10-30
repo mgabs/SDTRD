@@ -1,4 +1,4 @@
-# SDTRD Mutation Testing Rail for Rust (cargo-mutants)
+# Spec-Rails Mutation Testing Rail for Rust (cargo-mutants)
 # Target: 100% mutation kill score on domain logic. Surviving mutants are blocking defects.
 
 test_tool = "cargo"

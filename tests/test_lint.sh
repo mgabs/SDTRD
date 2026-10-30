@@ -19,7 +19,7 @@ fail() {
 echo "=== Running Shell Syntax & Spec Sanity Checks ==="
 
 # 1. POSIX shell syntax validation
-for script in "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/test_schema.sh" "$REPO_ROOT/bin/sdtrd-check" "$REPO_ROOT/tests/test_check.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh"; do
+for script in "$REPO_ROOT/bin/spec-rails" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/test_schema.sh" "$REPO_ROOT/bin/spec-rails-check" "$REPO_ROOT/tests/test_check.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh"; do
   if sh -n "$script"; then
     pass "Syntax valid: $(basename "$script")"
   else
@@ -28,7 +28,7 @@ for script in "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_installer.sh" "$REPO
 done
 
 # 2. Template integrity checks
-for template in roadmap.md research.md proposal.md spec.md design.md tasks.md bug-report.md sdtrd-ci.yml .pre-commit-config.yaml mutation/cargo-mutants.toml mutation/stryker.config.json mutation/mutmut.ini; do
+for template in roadmap.md research.md proposal.md spec.md design.md tasks.md bug-report.md spec-rails-ci.yml .pre-commit-config.yaml mutation/cargo-mutants.toml mutation/stryker.config.json mutation/mutmut.ini; do
   path="$REPO_ROOT/templates/$template"
   if [ -s "$path" ]; then
     pass "Template present and non-empty: $template"
@@ -39,7 +39,7 @@ done
 
 # 3. YAML syntax validation
 if python3 -c "import yaml" >/dev/null 2>&1; then
-  for yml in "$REPO_ROOT/.pre-commit-config.yaml" "$REPO_ROOT/templates/.pre-commit-config.yaml" "$REPO_ROOT/templates/sdtrd-ci.yml" "$REPO_ROOT/.github/workflows/test.yml"; do
+  for yml in "$REPO_ROOT/.pre-commit-config.yaml" "$REPO_ROOT/templates/.pre-commit-config.yaml" "$REPO_ROOT/templates/spec-rails-ci.yml" "$REPO_ROOT/.github/workflows/test.yml"; do
     if [ -f "$yml" ]; then
       if python3 -c "import yaml; yaml.safe_load(open('$yml'))" >/dev/null 2>&1; then
         pass "YAML valid: $(basename "$yml")"
@@ -52,7 +52,7 @@ fi
 
 # 4. Shellcheck if installed
 if command -v shellcheck >/dev/null 2>&1; then
-  if shellcheck "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh" "$REPO_ROOT/tests/test_lint.sh"; then
+  if shellcheck "$REPO_ROOT/bin/spec-rails" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh" "$REPO_ROOT/tests/test_lint.sh"; then
     pass "ShellCheck passed"
   else
     fail "ShellCheck failed" "issues found"

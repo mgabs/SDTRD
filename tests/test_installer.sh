@@ -2,7 +2,7 @@
 set -eu
 
 REPO_ROOT="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
-BIN="${SDTRD_BIN:-$REPO_ROOT/bin/sdtrd}"
+BIN="${SPEC_RAILS_BIN:-$REPO_ROOT/bin/spec-rails}"
 
 FAILED=0
 PASSED=0
@@ -33,7 +33,7 @@ assert_contains() {
 }
 
 # Fresh scratch root with a stub `openspec` on PATH (version via STUB_OPENSPEC_VERSION).
-SCRATCH="$(mktemp -d /tmp/sdtrd-installer-XXXXXX)"
+SCRATCH="$(mktemp -d /tmp/spec-rails-installer-XXXXXX)"
 trap 'rm -rf "$SCRATCH"' EXIT
 STUB="$SCRATCH/stub"
 mkdir -p "$STUB"
@@ -63,11 +63,11 @@ run_install() {
 }
 
 # ---- Unit: version_ge / set_schema_line ----
-SDTRD_SOURCE_ONLY=1
-export SDTRD_SOURCE_ONLY
+SPEC_RAILS_SOURCE_ONLY=1
+export SPEC_RAILS_SOURCE_ONLY
 # shellcheck disable=SC1090
 . "$BIN"
-unset SDTRD_SOURCE_ONLY
+unset SPEC_RAILS_SOURCE_ONLY
 
 vge() {
   rc=0
@@ -81,30 +81,30 @@ vge 2.0.0 1.15.0 0
 vge 1.9.0 1.15.0 1
 vge 1.100.0 1.15.0 0
 
-assert_eq "schema: sdtrd" "$(printf 'schema: spec-driven\n' | set_schema_line)" "set_schema_line replaces"
+assert_eq "schema: spec-rails" "$(printf 'schema: spec-driven\n' | set_schema_line)" "set_schema_line replaces"
 assert_eq "a: 1
-schema: sdtrd
+schema: spec-rails
 b: 2" "$(printf 'a: 1\nschema: x\nb: 2\n' | set_schema_line)" "set_schema_line preserves others"
 assert_eq "a: 1
-schema: sdtrd" "$(printf 'a: 1\n' | set_schema_line)" "set_schema_line adds when absent"
-assert_eq "schema: sdtrd" "$(printf '' | set_schema_line)" "set_schema_line empty input"
+schema: spec-rails" "$(printf 'a: 1\n' | set_schema_line)" "set_schema_line adds when absent"
+assert_eq "schema: spec-rails" "$(printf '' | set_schema_line)" "set_schema_line empty input"
 
 # ---- Scenario: fresh install (REQ-OSA-11, 12, 15) ----
 P="$(newproj)"
 git init -q -b main "$P"
 run_install "$P"
 assert_eq "0" "$RC" "fresh install exits 0"
-assert_file_exists "$P/openspec/schemas/sdtrd/schema.yaml" "schema copied"
-assert_file_exists "$P/openspec/schemas/sdtrd/templates/proposal.md" "schema templates copied"
-assert_eq "schema: sdtrd" "$(cat "$P/openspec/config.yaml")" "config created with schema only"
+assert_file_exists "$P/openspec/schemas/spec-rails/schema.yaml" "schema copied"
+assert_file_exists "$P/openspec/schemas/spec-rails/templates/proposal.md" "schema templates copied"
+assert_eq "schema: spec-rails" "$(cat "$P/openspec/config.yaml")" "config created with schema only"
 assert_file_exists "$P/.pre-commit-config.yaml" "pre-commit config installed"
-assert_file_exists "$P/.github/workflows/sdtrd-ci.yml" "CI workflow installed"
-assert_file_exists "$P/openspec/sdtrd/mutation/cargo-mutants.toml" "mutation template installed"
-assert_file_exists "$P/openspec/sdtrd/mutation/stryker.config.json" "stryker template installed"
-assert_file_exists "$P/openspec/sdtrd/mutation/mutmut.ini" "mutmut template installed"
+assert_file_exists "$P/.github/workflows/spec-rails-ci.yml" "CI workflow installed"
+assert_file_exists "$P/openspec/spec-rails/mutation/cargo-mutants.toml" "mutation template installed"
+assert_file_exists "$P/openspec/spec-rails/mutation/stryker.config.json" "stryker template installed"
+assert_file_exists "$P/openspec/spec-rails/mutation/mutmut.ini" "mutmut template installed"
 assert_file_exists "$P/.git/hooks/pre-commit" "git hook installed"
 assert_eq "1" "$(grep -c '^\.worktrees/$' "$P/.gitignore")" ".worktrees/ once"
-assert_eq "" "$(cmp "$REPO_ROOT/rules/AGENTS.md" "$P/openspec/sdtrd/AGENTS.md" 2>&1)" "agent rules copied outside openspec-generated files"
+assert_eq "" "$(cmp "$REPO_ROOT/rules/AGENTS.md" "$P/openspec/spec-rails/AGENTS.md" 2>&1)" "agent rules copied outside openspec-generated files"
 [ ! -e "$P/specs" ] && PASSED=$((PASSED + 1)) || { echo "FAIL: legacy specs/ must not be created"; FAILED=$((FAILED + 1)); }
 
 # ---- Scenario: idempotent re-run (REQ-OSA-13) ----
@@ -113,9 +113,9 @@ run_install "$P"
 assert_eq "0" "$RC" "re-run exits 0"
 assert_eq "$before" "$(snapshot "$P")" "re-run changes nothing"
 # drifted schema file is restored, then stable again
-printf 'drift\n' > "$P/openspec/schemas/sdtrd/schema.yaml"
+printf 'drift\n' > "$P/openspec/schemas/spec-rails/schema.yaml"
 run_install "$P"
-assert_eq "" "$(cmp "$REPO_ROOT/schemas/sdtrd/schema.yaml" "$P/openspec/schemas/sdtrd/schema.yaml" 2>&1)" "drifted schema restored"
+assert_eq "" "$(cmp "$REPO_ROOT/schemas/spec-rails/schema.yaml" "$P/openspec/schemas/spec-rails/schema.yaml" 2>&1)" "drifted schema restored"
 
 # ---- Scenario: missing prerequisite openspec/ ----
 P="$(newdir)"
@@ -157,7 +157,7 @@ assert_eq "context: |
 rules:
   proposal:
     - keep it short
-schema: sdtrd" "$(cat "$P/openspec/config.yaml")" "config keys preserved, schema added"
+schema: spec-rails" "$(cat "$P/openspec/config.yaml")" "config keys preserved, schema added"
 
 # ---- Scenario: existing pre-commit kept ----
 P="$(newproj)"
@@ -169,7 +169,7 @@ assert_eq "custom: pre-commit" "$(cat "$P/.pre-commit-config.yaml")" "existing p
 P="$(newproj)"
 printf 'schema: spec-driven\ncontext: x\n' > "$P/openspec/config.yaml"
 run_install "$P"
-assert_eq "schema: sdtrd
+assert_eq "schema: spec-rails
 context: x" "$(cat "$P/openspec/config.yaml")" "schema replaced in place"
 assert_contains "spec-driven" "$OUT" "previous schema printed"
 before="$(snapshot "$P")"
@@ -182,28 +182,28 @@ P="$(newproj)"
 run_install "$P"
 assert_eq "0" "$RC" "non-git exits 0"
 assert_contains "warning" "$OUT" "non-git warns"
-assert_eq "schema: sdtrd" "$(cat "$P/openspec/config.yaml")" "non-git still wires config"
+assert_eq "schema: spec-rails" "$(cat "$P/openspec/config.yaml")" "non-git still wires config"
 [ ! -e "$P/.git" ] && PASSED=$((PASSED + 1)) || { echo "FAIL: .git created"; FAILED=$((FAILED + 1)); }
 
 # ---- Scenario: rules outside openspec-regenerated files (REQ-OSA-15) ----
-case "$P/openspec/sdtrd/AGENTS.md" in
-  */openspec/sdtrd/*) PASSED=$((PASSED + 1)) ;;
+case "$P/openspec/spec-rails/AGENTS.md" in
+  */openspec/spec-rails/*) PASSED=$((PASSED + 1)) ;;
   *) echo "FAIL: rules path"; FAILED=$((FAILED + 1)) ;;
 esac
-assert_file_exists "$P/openspec/sdtrd/AGENTS.md" "rules present for completed install"
+assert_file_exists "$P/openspec/spec-rails/AGENTS.md" "rules present for completed install"
 
 # ---- Arg forms: no args (cwd), init, init dir ----
 P="$(newproj)"
 RC=0
 (cd "$P" && PATH="$STUB_PATH" /bin/sh "$BIN" >/dev/null 2>&1) || RC=$?
 assert_eq "0" "$RC" "no-arg install uses cwd"
-assert_file_exists "$P/openspec/schemas/sdtrd/schema.yaml" "no-arg install wired"
+assert_file_exists "$P/openspec/schemas/spec-rails/schema.yaml" "no-arg install wired"
 P="$(newproj)"
 (cd "$P" && PATH="$STUB_PATH" /bin/sh "$BIN" init >/dev/null 2>&1) || true
-assert_file_exists "$P/openspec/schemas/sdtrd/schema.yaml" "bare init uses cwd"
+assert_file_exists "$P/openspec/schemas/spec-rails/schema.yaml" "bare init uses cwd"
 P="$(newproj)"
 run_install init "$P"
-assert_file_exists "$P/openspec/schemas/sdtrd/schema.yaml" "init <dir> wired"
+assert_file_exists "$P/openspec/schemas/spec-rails/schema.yaml" "init <dir> wired"
 
 # ---- .gitignore handling ----
 P="$(newproj)"
@@ -245,49 +245,49 @@ mkdir -p "$P/.git/hooks"
 printf '#!/bin/sh\n# user hook\n' > "$P/.git/hooks/pre-commit"
 run_install "$P"
 assert_contains "# user hook" "$(cat "$P/.git/hooks/pre-commit")" "existing hook content kept"
-assert_contains "openspec/sdtrd/sdtrd-check" "$(cat "$P/.git/hooks/pre-commit")" "existing hook gets sdtrd-check"
+assert_contains "openspec/spec-rails/spec-rails-check" "$(cat "$P/.git/hooks/pre-commit")" "existing hook gets spec-rails-check"
 assert_eq "#!/bin/sh" "$(sed -n 1p "$P/.git/hooks/pre-commit")" "existing hook shebang stays first"
 cp "$P/.git/hooks/pre-commit" "$P/hook.before"
 run_install "$P"
 assert_eq "" "$(cmp "$P/hook.before" "$P/.git/hooks/pre-commit" 2>&1)" "existing hook not duplicated on re-run"
 printf '#!/bin/sh\nexit 0\n' > "$P/.git/hooks/pre-commit"
 run_install "$P"
-printf '#!/bin/sh\nexit 1\n' > "$P/openspec/sdtrd/sdtrd-check"
+printf '#!/bin/sh\nexit 1\n' > "$P/openspec/spec-rails/spec-rails-check"
 HOOK_RC=0
 (cd "$P" && git checkout -q -b feat/y && sh .git/hooks/pre-commit >/dev/null 2>&1) || HOOK_RC=$?
 assert_eq "1" "$HOOK_RC" "check runs even when user hook ends with exit 0"
 printf 'no shebang\n' > "$P/.git/hooks/pre-commit"
 run_install "$P"
 assert_eq "no shebang" "$(tail -n 1 "$P/.git/hooks/pre-commit")" "shebang-less hook content kept"
-assert_contains "openspec/sdtrd/sdtrd-check" "$(cat "$P/.git/hooks/pre-commit")" "shebang-less hook gets sdtrd-check"
+assert_contains "openspec/spec-rails/spec-rails-check" "$(cat "$P/.git/hooks/pre-commit")" "shebang-less hook gets spec-rails-check"
 
 # ---- Slice 5: hook and CI wiring (REQ-OSA-12, 16, 17) ----
 P="$(newproj)"
 git init -q -b main "$P"
 run_install "$P"
-assert_file_exists "$P/openspec/sdtrd/sdtrd-check" "sdtrd-check installed"
-assert_eq "yes" "$([ -x "$P/openspec/sdtrd/sdtrd-check" ] && echo yes || echo no)" "sdtrd-check executable"
-assert_eq "" "$(cmp "$REPO_ROOT/bin/sdtrd-check" "$P/openspec/sdtrd/sdtrd-check" 2>&1)" "sdtrd-check identical to source"
-assert_contains "openspec/sdtrd/sdtrd-check" "$(cat "$P/.git/hooks/pre-commit")" "hook invokes sdtrd-check"
-assert_contains "openspec/sdtrd/sdtrd-check" "$(cat "$P/.github/workflows/sdtrd-ci.yml")" "CI runs sdtrd-check"
-assert_contains "make test" "$(cat "$P/.github/workflows/sdtrd-ci.yml")" "CI still runs make test"
-assert_contains "Audit Spec-to-Code Mapping" "$(cat "$P/.github/workflows/sdtrd-ci.yml")" "CI keeps spec-to-code audit"
+assert_file_exists "$P/openspec/spec-rails/spec-rails-check" "spec-rails-check installed"
+assert_eq "yes" "$([ -x "$P/openspec/spec-rails/spec-rails-check" ] && echo yes || echo no)" "spec-rails-check executable"
+assert_eq "" "$(cmp "$REPO_ROOT/bin/spec-rails-check" "$P/openspec/spec-rails/spec-rails-check" 2>&1)" "spec-rails-check identical to source"
+assert_contains "openspec/spec-rails/spec-rails-check" "$(cat "$P/.git/hooks/pre-commit")" "hook invokes spec-rails-check"
+assert_contains "openspec/spec-rails/spec-rails-check" "$(cat "$P/.github/workflows/spec-rails-ci.yml")" "CI runs spec-rails-check"
+assert_contains "make test" "$(cat "$P/.github/workflows/spec-rails-ci.yml")" "CI still runs make test"
+assert_contains "Audit Spec-to-Code Mapping" "$(cat "$P/.github/workflows/spec-rails-ci.yml")" "CI keeps spec-to-code audit"
 
 # hook blocks on a failing check, passes when check passes (stub check on a feature branch)
 (cd "$P" && git checkout -q -b feat/x)
-printf '#!/bin/sh\necho "stub gate violation" >&2\nexit 1\n' > "$P/openspec/sdtrd/sdtrd-check"
+printf '#!/bin/sh\necho "stub gate violation" >&2\nexit 1\n' > "$P/openspec/spec-rails/spec-rails-check"
 HOOK_RC=0
 HOOK_OUT="$(cd "$P" && sh .git/hooks/pre-commit 2>&1)" || HOOK_RC=$?
-assert_eq "1" "$HOOK_RC" "hook fails when sdtrd-check fails"
-assert_contains "stub gate violation" "$HOOK_OUT" "hook surfaces sdtrd-check output"
-printf '#!/bin/sh\nexit 0\n' > "$P/openspec/sdtrd/sdtrd-check"
+assert_eq "1" "$HOOK_RC" "hook fails when spec-rails-check fails"
+assert_contains "stub gate violation" "$HOOK_OUT" "hook surfaces spec-rails-check output"
+printf '#!/bin/sh\nexit 0\n' > "$P/openspec/spec-rails/spec-rails-check"
 HOOK_RC=0
 (cd "$P" && sh .git/hooks/pre-commit >/dev/null 2>&1) || HOOK_RC=$?
-assert_eq "0" "$HOOK_RC" "hook passes when sdtrd-check passes"
-rm "$P/openspec/sdtrd/sdtrd-check"
+assert_eq "0" "$HOOK_RC" "hook passes when spec-rails-check passes"
+rm "$P/openspec/spec-rails/spec-rails-check"
 HOOK_RC=0
 (cd "$P" && sh .git/hooks/pre-commit >/dev/null 2>&1) || HOOK_RC=$?
-assert_eq "0" "$HOOK_RC" "hook skips check when sdtrd-check absent"
+assert_eq "0" "$HOOK_RC" "hook skips check when spec-rails-check absent"
 
 echo ""
 echo "=== Test Summary ==="

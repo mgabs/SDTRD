@@ -1,6 +1,6 @@
-# SDTRD Roadmap: Pure Git, Markdown & CI Rails
+# Spec-Rails Roadmap: Pure Git, Markdown & CI Rails
 
-SDTRD follows strict YAGNI: **no custom CLI binaries or command wrappers**.
+Spec-Rails follows strict YAGNI: **no custom CLI binaries or command wrappers**.
 All validation, synchronization, and rails are executed through standard Git, markdown conventions, AI agent prompt rules, and CI workflows.
 
 ---
@@ -30,7 +30,7 @@ The AI coding agent natively reads markdown, validates sections, and moves files
 
 ---
 
-## 2. Reusable GitHub CI Workflow (`templates/sdtrd-ci.yml`)
+## 2. Reusable GitHub CI Workflow (`templates/spec-rails-ci.yml`)
 
 A pure GitHub Actions workflow with zero custom binaries:
 

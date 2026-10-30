@@ -2,7 +2,7 @@
 set -eu
 
 REPO_ROOT="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
-SCHEMA_DIR="${SDTRD_SCHEMA_DIR:-$REPO_ROOT/schemas/sdtrd}"
+SCHEMA_DIR="${SPEC_RAILS_SCHEMA_DIR:-$REPO_ROOT/schemas/spec-rails}"
 SCHEMA="$SCHEMA_DIR/schema.yaml"
 
 FAILED=0
@@ -35,14 +35,14 @@ footer() {
   awk '/^## Review Gate$/ { on = 1 } on' "$1"
 }
 
-echo "=== Running sdtrd OpenSpec schema checks ==="
+echo "=== Running spec-rails OpenSpec schema checks ==="
 
 if [ ! -f "$SCHEMA" ]; then
   echo "FAIL: schema missing at $SCHEMA"
   exit 1
 fi
 
-assert_eq "sdtrd" "$(sed -n 's/^name: //p' "$SCHEMA")" "REQ-OSA-1 schema name"
+assert_eq "spec-rails" "$(sed -n 's/^name: //p' "$SCHEMA")" "REQ-OSA-1 schema name"
 
 assert_eq "research:
 proposal:research

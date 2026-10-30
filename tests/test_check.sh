@@ -2,7 +2,7 @@
 set -eu
 
 REPO_ROOT="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
-BIN="${SDTRD_CHECK_BIN:-$REPO_ROOT/bin/sdtrd-check}"
+BIN="${SPEC_RAILS_CHECK_BIN:-$REPO_ROOT/bin/spec-rails-check}"
 
 FAILED=0
 PASSED=0
@@ -36,7 +36,7 @@ assert_not_contains() {
   esac
 }
 
-echo "=== Running sdtrd-check tests ==="
+echo "=== Running spec-rails-check tests ==="
 
 if [ ! -f "$BIN" ]; then
   echo "FAIL: $BIN missing"
@@ -139,11 +139,11 @@ run_check() {
 }
 
 # --- Unit: gate_state / gate_ticked -----------------------------------------
-SDTRD_SOURCE_ONLY=1
-export SDTRD_SOURCE_ONLY
+SPEC_RAILS_SOURCE_ONLY=1
+export SPEC_RAILS_SOURCE_ONLY
 # shellcheck disable=SC1090
 . "$BIN"
-unset SDTRD_SOURCE_ONLY
+unset SPEC_RAILS_SOURCE_ONLY
 
 U="$SCR/unit"
 mkdir -p "$U"

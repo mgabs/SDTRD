@@ -1,6 +1,6 @@
 # How-To: Drive a Feature Through Gates 1 to 6
 
-This guide demonstrates end-to-end execution of a feature under the SDTRD lifecycle.
+This guide demonstrates end-to-end execution of a feature under the Spec-Rails lifecycle.
 
 ---
 

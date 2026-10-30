@@ -1,23 +1,23 @@
-# How-To: Bootstrap a Project with SDTRD
+# How-To: Bootstrap a Project with Spec-Rails
 
-This guide walks through installing SDTRD on an OpenSpec project.
+This guide walks through installing Spec-Rails on an OpenSpec project.
 
-> **Prerequisites**: run `openspec init` first (OpenSpec ≥ 1.15.0 on `PATH`) and install `jq`. The installer exits non-zero and writes nothing otherwise. It is idempotent, sets `schema: sdtrd` in `openspec/config.yaml`, never overwrites an existing `.pre-commit-config.yaml`, and puts agent rules in `openspec/sdtrd/` so `openspec update` leaves them alone. The scaffold listing below describes the legacy layout; see `specs/WORKFLOW.md` §7 for the OpenSpec layout.
+> **Prerequisites**: run `openspec init` first (OpenSpec ≥ 1.15.0 on `PATH`) and install `jq`. The installer exits non-zero and writes nothing otherwise. It is idempotent, sets `schema: spec-rails` in `openspec/config.yaml`, never overwrites an existing `.pre-commit-config.yaml`, and puts agent rules in `openspec/spec-rails/` so `openspec update` leaves them alone. The scaffold listing below describes the legacy layout; see `specs/WORKFLOW.md` §7 for the OpenSpec layout.
 
 ---
 
 ## 1. Run the Initializer
 
-From the `sdtrd` repository, run:
+From the `spec-rails` repository, run:
 
 ```bash
-/path/to/sdtrd/bin/sdtrd /path/to/your-project
+/path/to/spec-rails/bin/spec-rails /path/to/your-project
 ```
 
 Or from within your project directory:
 
 ```bash
-/path/to/sdtrd/bin/sdtrd .
+/path/to/spec-rails/bin/spec-rails .
 ```
 
 ---
@@ -31,7 +31,7 @@ your-project/
 ├── .gitignore               # Appends .worktrees/ if not present
 ├── .pre-commit-config.yaml  # Pre-commit hook configuration
 └── specs/
-    ├── WORKFLOW.md          # Canonical SDTRD workflow rules
+    ├── WORKFLOW.md          # Canonical Spec-Rails workflow rules
     ├── features/            # Active and proposed feature specs
     ├── bug-reports/         # Fast-track bug reports
     ├── living/              # Evergreen canonical system specifications
@@ -92,5 +92,5 @@ mutants:
 
 ```bash
 git add specs/ .gitignore Makefile
-git commit -m "chore: initialize SDTRD workflow and testing rails"
+git commit -m "chore: initialize Spec-Rails workflow and testing rails"
 ```

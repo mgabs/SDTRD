@@ -1,6 +1,6 @@
-# SDTRD Wiki: Spec-Driven, Testing-Railed Development
+# Spec-Rails Wiki: Spec-Driven, Testing-Railed Development
 
-SDTRD (Spec-Driven, Testing-Railed Development) is an engineering and AI-agent orchestration framework designed to eliminate hallucinated scope, stale documentation, untested regressions, and branch contamination in autonomous and pair-programming development.
+Spec-Rails (Spec-Driven, Testing-Railed Development) is an engineering and AI-agent orchestration framework designed to eliminate hallucinated scope, stale documentation, untested regressions, and branch contamination in autonomous and pair-programming development.
 
 For the comprehensive operational handbook, see [WAY_OF_WORKING.md](WAY_OF_WORKING.md).
 
@@ -37,7 +37,7 @@ For the comprehensive operational handbook, see [WAY_OF_WORKING.md](WAY_OF_WORKI
 
 ## 2. Gate Architecture
 
-SDTRD enforces 7 human-in-the-loop gates for features (Gates 0–6) and 3 fast-track gates for defects (Gates B1–B3).
+Spec-Rails enforces 7 human-in-the-loop gates for features (Gates 0–6) and 3 fast-track gates for defects (Gates B1–B3).
 
 ```mermaid
 flowchart TD
@@ -100,7 +100,7 @@ When a feature contains orthogonal tasks (decoupled modules, distinct endpoints,
    git branch -d feat/<feat>/stream-a
    git worktree prune
    ```
-5. **Rebasing**: The same rebase-and-re-verify rule applies to every merge in SDTRD — streams into features, features/fixes/chores into `main`.
+5. **Rebasing**: The same rebase-and-re-verify rule applies to every merge in Spec-Rails — streams into features, features/fixes/chores into `main`.
 
 ---
 
@@ -121,7 +121,7 @@ When a mutant survives:
 
 ## 5. Review Harness & Agent Steering: The LGTM Symbiosis
 
-SDTRD relies on a human-in-the-loop review cockpit to steer coding agents in real time. We pair SDTRD natively with [mgabs/lgtm](https://github.com/mgabs/lgtm) (Fast terminal diff reviewer, agent steering TUI, and security scanner).
+Spec-Rails relies on a human-in-the-loop review cockpit to steer coding agents in real time. We pair Spec-Rails natively with [mgabs/lgtm](https://github.com/mgabs/lgtm) (Fast terminal diff reviewer, agent steering TUI, and security scanner).
 
 ### 5.1 The Steering Feedback Loop
 
@@ -163,4 +163,4 @@ Autonomous agents sometimes take shortcuts to satisfy gate requirements. `lgtm` 
 5. **Security Scan**: Catches SQLi, shell command injection, hardcoded secrets, and TLS bypass in diff hunks.
 
 ### 5.4 Native MCP Server Integration
-AI agents operating under SDTRD connect directly to `lgtm` via its built-in Model Context Protocol server (`lgtm serve --mcp` / `lgtm mcp`), enabling agents to query diffs, verify static analysis status, and confirm resolution of review directives before requesting Gate sign-off.
+AI agents operating under Spec-Rails connect directly to `lgtm` via its built-in Model Context Protocol server (`lgtm serve --mcp` / `lgtm mcp`), enabling agents to query diffs, verify static analysis status, and confirm resolution of review directives before requesting Gate sign-off.

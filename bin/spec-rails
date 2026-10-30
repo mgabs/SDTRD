@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# sdtrd [init] [target-dir]: wire SDTRD into an existing OpenSpec project.
+# spec-rails [init] [target-dir]: wire Spec-Rails into an existing OpenSpec project.
 set -eu
 
 MIN_OPENSPEC="1.15.0"
@@ -9,12 +9,12 @@ version_ge() {
   [ "$(printf '%s\n%s\n' "$1" "$2" | sort -t. -k1,1n -k2,2n -k3,3n | head -n 1)" = "$2" ]
 }
 
-# set_schema_line: stdin -> stdout, forcing exactly one "schema: sdtrd" line.
+# set_schema_line: stdin -> stdout, forcing exactly one "schema: spec-rails" line.
 set_schema_line() {
   awk '
-    /^schema:/ { if (!done) print "schema: sdtrd"; done = 1; next }
+    /^schema:/ { if (!done) print "schema: spec-rails"; done = 1; next }
     { print }
-    END { if (!done) print "schema: sdtrd" }
+    END { if (!done) print "schema: spec-rails" }
   '
 }
 
@@ -31,10 +31,10 @@ install_hook() {
   mkdir -p "$(dirname -- "$hook")"
   cat <<'EOF' > "$hook"
 #!/bin/sh
-# SDTRD Workflow Branch Protection Hook
+# Spec-Rails Workflow Branch Protection Hook
 branch="$(git branch --show-current 2>/dev/null || git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
 if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
-    echo "ERROR: Direct commits to '$branch' are forbidden by SDTRD workflow." >&2
+    echo "ERROR: Direct commits to '$branch' are forbidden by Spec-Rails workflow." >&2
     echo "Please checkout an isolated branch first:" >&2
     echo "  git checkout -b feat/<id>-<name>   (for features)" >&2
     echo "  git checkout -b fix/<slug>          (for bugfixes)" >&2
@@ -42,35 +42,35 @@ if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
     exit 1
 fi
 
-# SDTRD LGTM Directive Preemption Hook
+# Spec-Rails LGTM Directive Preemption Hook
 if [ -d ".lgtm/reviews" ]; then
     directives="$(grep -rn "^#ref " .lgtm/reviews 2>/dev/null || true)"
     if [ -n "$directives" ]; then
         echo "ERROR: Unresolved LGTM review directives found in .lgtm/reviews/:" >&2
         echo "$directives" >&2
-        echo "SDTRD Rule: Review directives preempt all forward work. Resolve and clear them before committing." >&2
+        echo "Spec-Rails Rule: Review directives preempt all forward work. Resolve and clear them before committing." >&2
         exit 1
     fi
 fi
 
-# SDTRD Gate & Lane Check (installed by sdtrd)
-if [ -x "openspec/sdtrd/sdtrd-check" ]; then
-    sh openspec/sdtrd/sdtrd-check || exit 1
+# Spec-Rails Gate & Lane Check (installed by spec-rails)
+if [ -x "openspec/spec-rails/spec-rails-check" ]; then
+    sh openspec/spec-rails/spec-rails-check || exit 1
 fi
 EOF
   chmod +x "$hook"
 }
 
-# add_check_to_hook HOOK: run sdtrd-check at the top of a user-owned hook (after the shebang), once.
+# add_check_to_hook HOOK: run spec-rails-check at the top of a user-owned hook (after the shebang), once.
 add_check_to_hook() {
-  grep -q 'openspec/sdtrd/sdtrd-check' "$1" && return 0
-  tmp="$1.sdtrd.tmp"
+  grep -q 'openspec/spec-rails/spec-rails-check' "$1" && return 0
+  tmp="$1.spec-rails.tmp"
   {
     first="$(head -n 1 "$1")"
     case "$first" in '#!'*) printf '%s\n' "$first"; rest=2 ;; *) rest=1 ;; esac
-    printf '%s\n' '# SDTRD Gate & Lane Check (installed by sdtrd)' \
-      'if [ -x "openspec/sdtrd/sdtrd-check" ]; then' \
-      '    sh openspec/sdtrd/sdtrd-check || exit 1' \
+    printf '%s\n' '# Spec-Rails Gate & Lane Check (installed by spec-rails)' \
+      'if [ -x "openspec/spec-rails/spec-rails-check" ]; then' \
+      '    sh openspec/spec-rails/spec-rails-check || exit 1' \
       'fi'
     tail -n +"$rest" "$1"
   } > "$tmp"
@@ -96,36 +96,36 @@ main() {
     exit 1
   fi
 
-  (cd "$root/schemas/sdtrd" && find . -type f) | while IFS= read -r f; do
-    put_file "$root/schemas/sdtrd/$f" "$target/openspec/schemas/sdtrd/$f"
+  (cd "$root/schemas/spec-rails" && find . -type f) | while IFS= read -r f; do
+    put_file "$root/schemas/spec-rails/$f" "$target/openspec/schemas/spec-rails/$f"
   done
 
   config="$target/openspec/config.yaml"
   if [ -f "$config" ]; then
     prev="$(sed -n 's/^schema:[[:space:]]*//p' "$config" | head -n 1)"
-    set_schema_line < "$config" > "$config.sdtrd.tmp"
+    set_schema_line < "$config" > "$config.spec-rails.tmp"
   else
     prev=""
-    set_schema_line < /dev/null > "$config.sdtrd.tmp"
+    set_schema_line < /dev/null > "$config.spec-rails.tmp"
   fi
-  if [ -f "$config" ] && cmp -s "$config.sdtrd.tmp" "$config"; then
-    rm "$config.sdtrd.tmp"
+  if [ -f "$config" ] && cmp -s "$config.spec-rails.tmp" "$config"; then
+    rm "$config.spec-rails.tmp"
   else
-    mv "$config.sdtrd.tmp" "$config"
+    mv "$config.spec-rails.tmp" "$config"
   fi
-  if [ -n "$prev" ] && [ "$prev" != "sdtrd" ]; then
-    echo "Replaced previous schema '$prev' with 'sdtrd' in openspec/config.yaml"
+  if [ -n "$prev" ] && [ "$prev" != "spec-rails" ]; then
+    echo "Replaced previous schema '$prev' with 'spec-rails' in openspec/config.yaml"
   fi
 
   if [ ! -f "$target/.pre-commit-config.yaml" ]; then
     cp "$root/templates/.pre-commit-config.yaml" "$target/.pre-commit-config.yaml"
   fi
-  put_file "$root/templates/sdtrd-ci.yml" "$target/.github/workflows/sdtrd-ci.yml"
+  put_file "$root/templates/spec-rails-ci.yml" "$target/.github/workflows/spec-rails-ci.yml"
   for m in "$root/templates/mutation/"*; do
-    put_file "$m" "$target/openspec/sdtrd/mutation/$(basename -- "$m")"
+    put_file "$m" "$target/openspec/spec-rails/mutation/$(basename -- "$m")"
   done
-  put_file "$root/rules/AGENTS.md" "$target/openspec/sdtrd/AGENTS.md"
-  put_file "$root/bin/sdtrd-check" "$target/openspec/sdtrd/sdtrd-check"
+  put_file "$root/rules/AGENTS.md" "$target/openspec/spec-rails/AGENTS.md"
+  put_file "$root/bin/spec-rails-check" "$target/openspec/spec-rails/spec-rails-check"
 
   if [ -f "$target/.gitignore" ]; then
     grep -qxF ".worktrees/" "$target/.gitignore" || printf "\n.worktrees/\n" >> "$target/.gitignore"
@@ -141,7 +141,7 @@ main() {
     add_check_to_hook "$target/.git/hooks/pre-commit"
   fi
 
-  echo "SDTRD wired into $target/openspec/ (schema: sdtrd)"
+  echo "Spec-Rails wired into $target/openspec/ (schema: spec-rails)"
 }
 
-[ -n "${SDTRD_SOURCE_ONLY:-}" ] || main "$@"
+[ -n "${SPEC_RAILS_SOURCE_ONLY:-}" ] || main "$@"

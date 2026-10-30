@@ -1,10 +1,10 @@
-# Bug Report: Existing pre-commit hook never runs sdtrd-check
+# Bug Report: Existing pre-commit hook never runs spec-rails-check
 
 ## Status
 - **Status**: Resolved
 - **Date**: `2026-10-30`
 - **Severity**: Medium
-- **Component**: `bin/sdtrd` (hook install)
+- **Component**: `bin/spec-rails` (hook install)
 - **Worktree / Branch**: `fix/existing-hook-check`
 - **Regression Tests Added**:
   - `tests/test_installer.sh` (existing hook section)
@@ -17,7 +17,7 @@ When the target already has `.git/hooks/pre-commit`, the installer leaves it unt
 2. Run the installer.
 
 ### Expected Result
-The user hook is preserved and additionally runs `openspec/sdtrd/sdtrd-check`; re-running does not duplicate the call.
+The user hook is preserved and additionally runs `openspec/spec-rails/spec-rails-check`; re-running does not duplicate the call.
 
 ### Actual Result
-The hook is unchanged and never calls `sdtrd-check`.
+The hook is unchanged and never calls `spec-rails-check`.

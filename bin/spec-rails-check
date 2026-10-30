@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# sdtrd-check: lane + gate check for OpenSpec changes using the sdtrd schema.
+# spec-rails-check: lane + gate check for OpenSpec changes using the spec-rails schema.
 # Exit codes: 0 ok | 1 violation | 2 environment/parse error. Requires jq.
 # Branch guard: main/master fail; a detached HEAD (empty branch name) or a
 # non-git directory is allowed. Artifact presence comes from `openspec status --json`.
@@ -72,39 +72,39 @@ violations() {
 main() {
   set -u
   if ! command -v jq >/dev/null 2>&1; then
-    echo "sdtrd-check: jq is required but not found on PATH" >&2
+    echo "spec-rails-check: jq is required but not found on PATH" >&2
     return 2
   fi
   if ! command -v openspec >/dev/null 2>&1; then
-    echo "sdtrd-check: openspec is required but not found on PATH" >&2
+    echo "spec-rails-check: openspec is required but not found on PATH" >&2
     return 2
   fi
 
   _branch=$(git branch --show-current 2>/dev/null || true)
   case "$_branch" in
     main | master)
-      echo "sdtrd-check: direct commits on '$_branch' are not allowed; use a feature branch" >&2
+      echo "spec-rails-check: direct commits on '$_branch' are not allowed; use a feature branch" >&2
       return 1
       ;;
   esac
 
   _list=$(openspec list --json 2>&1) || {
-    echo "sdtrd-check: 'openspec list --json' failed: $_list" >&2
+    echo "spec-rails-check: 'openspec list --json' failed: $_list" >&2
     return 2
   }
   _names=$(printf '%s' "$_list" | jq -r '.changes[].name' 2>&1) || {
-    echo "sdtrd-check: cannot parse 'openspec list --json': $_names" >&2
+    echo "spec-rails-check: cannot parse 'openspec list --json': $_names" >&2
     return 2
   }
 
   _out=""
   for _c in $_names; do
     _status=$(openspec status --change "$_c" --json 2>&1) || {
-      echo "sdtrd-check: 'openspec status --change $_c --json' failed: $_status" >&2
+      echo "spec-rails-check: 'openspec status --change $_c --json' failed: $_status" >&2
       return 2
     }
     _err=$(printf '%s' "$_status" | jq -e 'if (.artifacts | type) == "array" then true else error("status JSON has no artifacts array") end' 2>&1 >/dev/null) || {
-      echo "sdtrd-check: cannot parse status for '$_c': $_err" >&2
+      echo "spec-rails-check: cannot parse status for '$_c': $_err" >&2
       return 2
     }
     _results=""
@@ -118,13 +118,13 @@ main() {
   done
 
   if [ -n "$_out" ]; then
-    printf 'sdtrd-check: gate violations:\n%s' "$_out" >&2
+    printf 'spec-rails-check: gate violations:\n%s' "$_out" >&2
     return 1
   fi
   return 0
 }
 
-if [ "${SDTRD_SOURCE_ONLY:-}" != 1 ]; then
+if [ "${SPEC_RAILS_SOURCE_ONLY:-}" != 1 ]; then
   main "$@"
   exit $?
 fi

@@ -1,6 +1,6 @@
 # How-To: Parallel Worktrees & Multi-Agent Streams
 
-When a feature contains orthogonal tasks with zero mutual dependencies, SDTRD isolates execution across Git worktrees to prevent branch contamination and enable parallel subagent execution.
+When a feature contains orthogonal tasks with zero mutual dependencies, Spec-Rails isolates execution across Git worktrees to prevent branch contamination and enable parallel subagent execution.
 
 ---
 

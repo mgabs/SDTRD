@@ -1,4 +1,4 @@
-name: SDTRD Rails
+name: Spec-Rails Rails
 
 on:
   pull_request:
@@ -38,9 +38,9 @@ jobs:
 
       - name: Gate & Lane Check
         run: |
-          if [ -x openspec/sdtrd/sdtrd-check ]; then
+          if [ -x openspec/spec-rails/spec-rails-check ]; then
             npm install -g @fission-ai/openspec
-            sh openspec/sdtrd/sdtrd-check
+            sh openspec/spec-rails/spec-rails-check
           fi
 
       - name: Set up Pre-Commit

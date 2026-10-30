@@ -1,4 +1,4 @@
-# SDTRD Way of Working (WoW)
+# Spec-Rails Way of Working (WoW)
 
 > **Spec-Driven, Testing-Railed Development** — An engineering handbook for humans and autonomous AI agents.
 
@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary & Core Invariants
 
-SDTRD transforms AI-assisted software delivery from speculative, prompt-driven chaos into a deterministic, gated assembly line. It guarantees four engineering invariants:
+Spec-Rails transforms AI-assisted software delivery from speculative, prompt-driven chaos into a deterministic, gated assembly line. It guarantees four engineering invariants:
 
 1. **`main` is strictly immutable to direct edits**: Zero code, specs, or docs land directly on `main`. Every commit lands through an isolated lane via `--ff-only`.
 2. **Code is a liability, not an asset**: The smallest diff that satisfies formal requirements and passes all rails wins.
@@ -48,7 +48,7 @@ flowchart TD
 
 ## 2. The Mindset: Ponytail Discipline & Strict YAGNI
 
-SDTRD adopts the **Ponytail Mindset** — the pragmatic, ruthless discipline of senior unix hackers who hate unnecessary code and refuse to be paged at 3 AM:
+Spec-Rails adopts the **Ponytail Mindset** — the pragmatic, ruthless discipline of senior unix hackers who hate unnecessary code and refuse to be paged at 3 AM:
 
 - **Default Answer is "No"**: Push back on speculative, vague, or unneeded requirements before typing code. Challenge requirements during Gate 0 and Gate 1.
 - **Boring > Clever**: Choose standard library functions over third-party dependencies. Choose simple iterative loops over complex metaprogramming acrobatics.
@@ -219,7 +219,7 @@ flowchart LR
 When Gate 4 identifies orthogonal streams, execute them in parallel Git worktrees without repository contamination:
 
 ```text
-sdtrd/                           <-- Root worktree (main or feat/<id>)
+spec-rails/                           <-- Root worktree (main or feat/<id>)
 ├── .worktrees/
 │   ├── w1.1-stream-a/           <-- Isolated worktree for Stream A (feat/w1.1/a)
 │   └── w1.1-stream-b/           <-- Isolated worktree for Stream B (feat/w1.1/b)
@@ -244,7 +244,7 @@ sdtrd/                           <-- Root worktree (main or feat/<id>)
 
 ## 7. The Review Cockpit: [mgabs/lgtm](https://github.com/mgabs/lgtm) Steering & Preemption
 
-SDTRD pairs natively with `mgabs/lgtm` for real-time diff review and agent steering.
+Spec-Rails pairs natively with `mgabs/lgtm` for real-time diff review and agent steering.
 
 ### Directive Preemption Protocol
 Reviewers inject line-anchored chords into diffs:
@@ -266,7 +266,7 @@ Reviewers inject line-anchored chords into diffs:
 
 ## 8. Verification Rails & Pre-Commit Standards
 
-Every repository initialized with `sdtrd` contains active pre-commit and CI verification rails:
+Every repository initialized with `spec-rails` contains active pre-commit and CI verification rails:
 
 ### Pre-Commit Standards
 - Pre-commit hooks run automatically on every `git commit`.
@@ -275,9 +275,9 @@ Every repository initialized with `sdtrd` contains active pre-commit and CI veri
 ### Mutation Testing Rails
 - **100% Mutation Kill Score** on domain logic, zero exemptions.
 - Reference configurations in `templates/mutation/`:
-  - **Rust**: [templates/mutation/cargo-mutants.toml](file:///Users/mmetawea/Workbench/sdtrd/templates/mutation/cargo-mutants.toml)
-  - **JS / TS**: [templates/mutation/stryker.config.json](file:///Users/mmetawea/Workbench/sdtrd/templates/mutation/stryker.config.json)
-  - **Python**: [templates/mutation/mutmut.ini](file:///Users/mmetawea/Workbench/sdtrd/templates/mutation/mutmut.ini)
+  - **Rust**: [templates/mutation/cargo-mutants.toml](file:///Users/mmetawea/Workbench/spec-rails/templates/mutation/cargo-mutants.toml)
+  - **JS / TS**: [templates/mutation/stryker.config.json](file:///Users/mmetawea/Workbench/spec-rails/templates/mutation/stryker.config.json)
+  - **Python**: [templates/mutation/mutmut.ini](file:///Users/mmetawea/Workbench/spec-rails/templates/mutation/mutmut.ini)
 
 ---
 

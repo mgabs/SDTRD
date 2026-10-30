@@ -1,13 +1,13 @@
 ---
-name: sdtrd
+name: spec-rails
 description: >-
-  Spec-Driven, Testing-Railed Development (SDTRD) workflow for gated feature
+  Spec-Driven, Testing-Railed Development (Spec-Rails) workflow for gated feature
   delivery, multi-agent Git worktree streams, Red-Green-Mutation testing rails,
   and zero-contamination bugfix isolation. Activate when bootstrapping `specs/`,
   proposing features, triaging bugs, or executing gated vertical slices.
 ---
 
-# SDTRD Skill
+# Spec-Rails Skill
 
 Follow [specs/WORKFLOW.md](../../specs/WORKFLOW.md) and copy templates from [templates/](../../templates/).
 
@@ -41,4 +41,4 @@ Follow [specs/WORKFLOW.md](../../specs/WORKFLOW.md) and copy templates from [tem
    - **5.x-C**: Run mutation testing $\rightarrow$ achieve $100\%$ kill score on core logic (no exemptions: kill, delete dead code, or restructure equivalent mutants).
 7. **Gate 6 (Archive & Merge)**: Ensure all stream worktrees are merged, removed, and pruned (`git worktree prune`). Rebase onto `main`, re-verify rails, sync specs to `specs/living/` (safe overwrite), archive to `specs/archive/<id>-<slug>/`, merge `--ff-only`, and update `specs/ROADMAP.md` to `✅ Shipped`.
 
-**OpenSpec projects** (`openspec/` present, schema `sdtrd`): create changes with `openspec new change`, write Gate 2 as delta specs (`### Requirement: REQ-X-N name`, MUST/SHALL), run `openspec validate` after stream rebases, and replace the copy/move steps of Gate 6 with `openspec archive <change>`. Run `sdtrd-check` before committing. See `specs/WORKFLOW.md` §7.
+**OpenSpec projects** (`openspec/` present, schema `spec-rails`): create changes with `openspec new change`, write Gate 2 as delta specs (`### Requirement: REQ-X-N name`, MUST/SHALL), run `openspec validate` after stream rebases, and replace the copy/move steps of Gate 6 with `openspec archive <change>`. Run `spec-rails-check` before committing. See `specs/WORKFLOW.md` §7.

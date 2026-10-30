@@ -1,4 +1,4 @@
-# SDTRD (Spec-Driven, Testing-Railed Development) Rules
+# Spec-Rails (Spec-Driven, Testing-Railed Development) Rules
 
 When working in a repository containing `specs/WORKFLOW.md`:
 

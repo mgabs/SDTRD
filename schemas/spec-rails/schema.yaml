@@ -1,6 +1,6 @@
-name: sdtrd
+name: spec-rails
 version: 1
-description: SDTRD gated workflow on OpenSpec - research → proposal → specs → design → tasks, each behind a human Review Gate
+description: Spec-Rails gated workflow on OpenSpec - research → proposal → specs → design → tasks, each behind a human Review Gate
 artifacts:
   - id: research
     generates: research.md
@@ -50,7 +50,7 @@ artifacts:
       REMOVED (include **Reason** and **Migration**), RENAMED (FROM:/TO:).
       New capabilities start with `## Purpose` (one or two sentences); never add it to a delta for an existing capability.
 
-      SDTRD conventions:
+      Spec-Rails conventions:
       - Every requirement header starts with its stable key: `### Requirement: REQ-<DOMAIN>-<N> <Name>`
         (or `NFR-<DOMAIN>-<N>` for budgets). Keys are never reused; deprecated requirements stay, marked `[DEPRECATED by <change>]`.
         MODIFIED and REMOVED headers must repeat the full `REQ-... <Name>` text exactly, because OpenSpec matches on the whole header.
