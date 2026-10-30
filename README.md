@@ -101,5 +101,7 @@ Copies the `spec-rails` schema to `openspec/schemas/spec-rails/`, sets `schema: 
 
 ### Running Tests
 ```bash
-make test
+make test        # lint, installer, schema, gate check, CI audit, self-copy sync, e2e, BDD
+make test-e2e    # real OpenSpec CLI in a throwaway repo; skips if openspec or jq is missing
 ```
+`make test-lint` also checks that doc links resolve, docs do not tell users to copy templates by hand, and no shell helper is unused.
