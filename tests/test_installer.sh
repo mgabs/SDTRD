@@ -244,7 +244,22 @@ git init -q -b main "$P"
 mkdir -p "$P/.git/hooks"
 printf '#!/bin/sh\n# user hook\n' > "$P/.git/hooks/pre-commit"
 run_install "$P"
-assert_eq "# user hook" "$(sed -n 2p "$P/.git/hooks/pre-commit")" "existing hook preserved"
+assert_contains "# user hook" "$(cat "$P/.git/hooks/pre-commit")" "existing hook content kept"
+assert_contains "openspec/sdtrd/sdtrd-check" "$(cat "$P/.git/hooks/pre-commit")" "existing hook gets sdtrd-check"
+assert_eq "#!/bin/sh" "$(sed -n 1p "$P/.git/hooks/pre-commit")" "existing hook shebang stays first"
+cp "$P/.git/hooks/pre-commit" "$P/hook.before"
+run_install "$P"
+assert_eq "" "$(cmp "$P/hook.before" "$P/.git/hooks/pre-commit" 2>&1)" "existing hook not duplicated on re-run"
+printf '#!/bin/sh\nexit 0\n' > "$P/.git/hooks/pre-commit"
+run_install "$P"
+printf '#!/bin/sh\nexit 1\n' > "$P/openspec/sdtrd/sdtrd-check"
+HOOK_RC=0
+(cd "$P" && git checkout -q -b feat/y && sh .git/hooks/pre-commit >/dev/null 2>&1) || HOOK_RC=$?
+assert_eq "1" "$HOOK_RC" "check runs even when user hook ends with exit 0"
+printf 'no shebang\n' > "$P/.git/hooks/pre-commit"
+run_install "$P"
+assert_eq "no shebang" "$(tail -n 1 "$P/.git/hooks/pre-commit")" "shebang-less hook content kept"
+assert_contains "openspec/sdtrd/sdtrd-check" "$(cat "$P/.git/hooks/pre-commit")" "shebang-less hook gets sdtrd-check"
 
 # ---- Slice 5: hook and CI wiring (REQ-OSA-12, 16, 17) ----
 P="$(newproj)"

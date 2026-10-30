@@ -61,6 +61,23 @@ EOF
   chmod +x "$hook"
 }
 
+# add_check_to_hook HOOK: run sdtrd-check at the top of a user-owned hook (after the shebang), once.
+add_check_to_hook() {
+  grep -q 'openspec/sdtrd/sdtrd-check' "$1" && return 0
+  tmp="$1.sdtrd.tmp"
+  {
+    first="$(head -n 1 "$1")"
+    case "$first" in '#!'*) printf '%s\n' "$first"; rest=2 ;; *) rest=1 ;; esac
+    printf '%s\n' '# SDTRD Gate & Lane Check (installed by sdtrd)' \
+      'if [ -x "openspec/sdtrd/sdtrd-check" ]; then' \
+      '    sh openspec/sdtrd/sdtrd-check || exit 1' \
+      'fi'
+    tail -n +"$rest" "$1"
+  } > "$tmp"
+  cat "$tmp" > "$1"
+  rm "$tmp"
+}
+
 main() {
   root="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
   target="${1:-.}"
@@ -120,6 +137,8 @@ main() {
     echo "warning: $target is not a git repository; skipping git hook." >&2
   elif [ ! -f "$target/.git/hooks/pre-commit" ]; then
     install_hook "$target/.git/hooks/pre-commit"
+  else
+    add_check_to_hook "$target/.git/hooks/pre-commit"
   fi
 
   echo "SDTRD wired into $target/openspec/ (schema: sdtrd)"
