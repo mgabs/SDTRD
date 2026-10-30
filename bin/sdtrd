@@ -1,37 +1,35 @@
 #!/usr/bin/env sh
+# sdtrd [init] [target-dir]: wire SDTRD into an existing OpenSpec project.
 set -eu
 
-SDTRD_ROOT="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
+MIN_OPENSPEC="1.15.0"
 
-target="${1:-.}"
-if [ "$target" = "init" ]; then
-  target="${2:-.}"
-fi
+# version_ge A B: succeeds when dotted numeric version A >= B.
+version_ge() {
+  [ "$(printf '%s\n%s\n' "$1" "$2" | sort -t. -k1,1n -k2,2n -k3,3n | head -n 1)" = "$2" ]
+}
 
-mkdir -p "$target/specs/features" "$target/specs/bug-reports" "$target/specs/living" "$target/specs/archive" "$target/specs/templates/mutation"
-cp "$SDTRD_ROOT/specs/WORKFLOW.md" "$target/specs/WORKFLOW.md"
-cp "$SDTRD_ROOT/templates/"*.md "$target/specs/templates/"
-cp "$SDTRD_ROOT/templates/.pre-commit-config.yaml" "$target/specs/templates/.pre-commit-config.yaml"
-cp "$SDTRD_ROOT/templates/sdtrd-ci.yml" "$target/specs/templates/sdtrd-ci.yml"
-cp "$SDTRD_ROOT/templates/mutation/"* "$target/specs/templates/mutation/"
+# set_schema_line: stdin -> stdout, forcing exactly one "schema: sdtrd" line.
+set_schema_line() {
+  awk '
+    /^schema:/ { if (!done) print "schema: sdtrd"; done = 1; next }
+    { print }
+    END { if (!done) print "schema: sdtrd" }
+  '
+}
 
-if [ ! -f "$target/specs/ROADMAP.md" ]; then
-  cp "$SDTRD_ROOT/templates/roadmap.md" "$target/specs/ROADMAP.md"
-fi
+# put_file SRC DST: copy only when DST is absent or differs.
+put_file() {
+  if [ ! -f "$2" ] || ! cmp -s "$1" "$2"; then
+    mkdir -p "$(dirname -- "$2")"
+    cp "$1" "$2"
+  fi
+}
 
-if [ ! -f "$target/.pre-commit-config.yaml" ]; then
-  cp "$SDTRD_ROOT/templates/.pre-commit-config.yaml" "$target/.pre-commit-config.yaml"
-fi
-
-if [ -f "$target/.gitignore" ]; then
-  grep -qxF ".worktrees/" "$target/.gitignore" || printf "\n.worktrees/\n" >> "$target/.gitignore"
-else
-  printf ".worktrees/\n" > "$target/.gitignore"
-fi
-
-if [ -d "$target/.git" ] && [ ! -f "$target/.git/hooks/pre-commit" ]; then
-  mkdir -p "$target/.git/hooks"
-  cat <<'EOF' > "$target/.git/hooks/pre-commit"
+install_hook() {
+  hook="$1"
+  mkdir -p "$(dirname -- "$hook")"
+  cat <<'EOF' > "$hook"
 #!/bin/sh
 # SDTRD Workflow Branch Protection Hook
 branch="$(git branch --show-current 2>/dev/null || git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
@@ -55,7 +53,70 @@ if [ -d ".lgtm/reviews" ]; then
     fi
 fi
 EOF
-  chmod +x "$target/.git/hooks/pre-commit"
-fi
+  chmod +x "$hook"
+}
 
-echo "SDTRD initialized in $target/specs/"
+main() {
+  root="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
+  target="${1:-.}"
+  if [ "$target" = "init" ]; then
+    target="${2:-.}"
+  fi
+
+  if [ ! -d "$target/openspec" ]; then
+    echo "ERROR: $target/openspec not found. Run 'openspec init' first." >&2
+    exit 1
+  fi
+
+  version="$(openspec --version 2>/dev/null | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || true)"
+  if [ -z "$version" ] || ! version_ge "$version" "$MIN_OPENSPEC"; then
+    echo "ERROR: OpenSpec >= $MIN_OPENSPEC is required on PATH (found: ${version:-none})." >&2
+    exit 1
+  fi
+
+  (cd "$root/schemas/sdtrd" && find . -type f) | while IFS= read -r f; do
+    put_file "$root/schemas/sdtrd/$f" "$target/openspec/schemas/sdtrd/$f"
+  done
+
+  config="$target/openspec/config.yaml"
+  if [ -f "$config" ]; then
+    prev="$(sed -n 's/^schema:[[:space:]]*//p' "$config" | head -n 1)"
+    set_schema_line < "$config" > "$config.sdtrd.tmp"
+  else
+    prev=""
+    set_schema_line < /dev/null > "$config.sdtrd.tmp"
+  fi
+  if [ -f "$config" ] && cmp -s "$config.sdtrd.tmp" "$config"; then
+    rm "$config.sdtrd.tmp"
+  else
+    mv "$config.sdtrd.tmp" "$config"
+  fi
+  if [ -n "$prev" ] && [ "$prev" != "sdtrd" ]; then
+    echo "Replaced previous schema '$prev' with 'sdtrd' in openspec/config.yaml"
+  fi
+
+  if [ ! -f "$target/.pre-commit-config.yaml" ]; then
+    cp "$root/templates/.pre-commit-config.yaml" "$target/.pre-commit-config.yaml"
+  fi
+  put_file "$root/templates/sdtrd-ci.yml" "$target/.github/workflows/sdtrd-ci.yml"
+  for m in "$root/templates/mutation/"*; do
+    put_file "$m" "$target/openspec/sdtrd/mutation/$(basename -- "$m")"
+  done
+  put_file "$root/rules/AGENTS.md" "$target/openspec/sdtrd/AGENTS.md"
+
+  if [ -f "$target/.gitignore" ]; then
+    grep -qxF ".worktrees/" "$target/.gitignore" || printf "\n.worktrees/\n" >> "$target/.gitignore"
+  else
+    printf ".worktrees/\n" > "$target/.gitignore"
+  fi
+
+  if [ ! -d "$target/.git" ]; then
+    echo "warning: $target is not a git repository; skipping git hook." >&2
+  elif [ ! -f "$target/.git/hooks/pre-commit" ]; then
+    install_hook "$target/.git/hooks/pre-commit"
+  fi
+
+  echo "SDTRD wired into $target/openspec/ (schema: sdtrd)"
+}
+
+[ -n "${SDTRD_SOURCE_ONLY:-}" ] || main "$@"

@@ -52,22 +52,34 @@ git add README.md
 git commit -q -m "initial commit"
 
 echo ""
-echo "Scenario 1: Bootstrap a clean repository with SDTRD structure"
-sh "$BIN" . >/dev/null
+echo "Scenario 1: Bootstrap an OpenSpec repository with SDTRD wiring"
+STUB_DIR="$TEST_DIR/.stub"
+mkdir -p "$STUB_DIR" openspec
+printf '#!/bin/sh\necho 1.15.0\n' > "$STUB_DIR/openspec"
+chmod +x "$STUB_DIR/openspec"
+PATH="$STUB_DIR:$PATH" sh "$BIN" . >/dev/null
 
-assert_file "specs/WORKFLOW.md" "specs/WORKFLOW.md exists"
-assert_file "specs/ROADMAP.md" "specs/ROADMAP.md exists"
-assert_dir "specs/features" "specs/features/ directory exists"
-assert_dir "specs/living" "specs/living/ directory exists"
-assert_dir "specs/archive" "specs/archive/ directory exists"
-assert_dir "specs/bug-reports" "specs/bug-reports/ directory exists"
+assert_file "openspec/schemas/sdtrd/schema.yaml" "openspec/schemas/sdtrd/schema.yaml exists"
+assert_file "openspec/sdtrd/AGENTS.md" "SDTRD agent rules installed"
+assert_file ".github/workflows/sdtrd-ci.yml" "CI workflow installed"
 assert_file ".pre-commit-config.yaml" ".pre-commit-config.yaml exists"
+if grep -qx "schema: sdtrd" openspec/config.yaml; then
+  step_pass "openspec/config.yaml selects schema sdtrd"
+else
+  step_fail "openspec/config.yaml selects schema sdtrd" "schema line missing"
+fi
 
 if grep -qxF ".worktrees/" .gitignore; then
   step_pass ".worktrees/ is present in .gitignore"
 else
   step_fail ".worktrees/ is present in .gitignore" "missing from .gitignore"
 fi
+
+# Scenarios below simulate the legacy specs/ lifecycle without the installer
+mkdir -p specs/features specs/living specs/archive specs/bug-reports specs/templates
+cp "$SDTRD_ROOT/templates/"*.md specs/templates/
+cp "$SDTRD_ROOT/templates/roadmap.md" specs/ROADMAP.md
+rm -rf "$STUB_DIR"
 
 git checkout -q -b chore/bootstrap-sdtrd
 git add .

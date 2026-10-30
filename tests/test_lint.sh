@@ -19,7 +19,7 @@ fail() {
 echo "=== Running Shell Syntax & Spec Sanity Checks ==="
 
 # 1. POSIX shell syntax validation
-for script in "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_init.sh" "$REPO_ROOT/tests/test_schema.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh"; do
+for script in "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/test_schema.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh"; do
   if sh -n "$script"; then
     pass "Syntax valid: $(basename "$script")"
   else
@@ -52,7 +52,7 @@ fi
 
 # 4. Shellcheck if installed
 if command -v shellcheck >/dev/null 2>&1; then
-  if shellcheck "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_init.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh" "$REPO_ROOT/tests/test_lint.sh"; then
+  if shellcheck "$REPO_ROOT/bin/sdtrd" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh" "$REPO_ROOT/tests/test_lint.sh"; then
     pass "ShellCheck passed"
   else
     fail "ShellCheck failed" "issues found"
