@@ -11,7 +11,7 @@ Spec-Rails transforms AI-assisted software delivery from speculative, prompt-dri
 1. **`main` is strictly immutable to direct edits**: Zero code, specs, or docs land directly on `main`. Every commit lands through an isolated lane via `--ff-only`.
 2. **Code is a liability, not an asset**: The smallest diff that satisfies formal requirements and passes all rails wins.
 3. **No untested code exists**: Code does not exist until a test fails for its absence. Coverage ($\ge 95\%$) is insufficient without a **100% mutation kill score**.
-4. **Specs are evergreen living truth**: Specifications are full capability models, never partial deltas. They sync into `specs/living/` upon shipping. *(On OpenSpec projects, specs are OpenSpec delta specs archived with `openspec archive`; see `specs/WORKFLOW.md` §7.)*
+4. **Specs are evergreen living truth**: Specifications live in `openspec/specs/` and change only through OpenSpec delta specs, which `openspec archive` merges upon shipping. See `specs/WORKFLOW.md` §7.
 
 ```mermaid
 flowchart TD
@@ -116,7 +116,7 @@ sequenceDiagram
     Agent->>Human: Present Gate 1 (Proposal)
     Human-->>Agent: Gate 1 Approved
 
-    Agent->>Agent: Draft specs/features/id/spec.md (Full Capability Spec)
+    Agent->>Agent: Draft openspec/changes/id/spec.md (Full Capability Spec)
     Agent->>Human: Present Gate 2 (Specs)
     Human-->>Agent: Gate 2 Approved
 
@@ -138,35 +138,35 @@ sequenceDiagram
     end
 
     Agent->>Git: Rebase onto main, re-verify all rails
-    Agent->>Git: Overwrite specs/living/<cap>/spec.md & archive research
+    Agent->>Git: openspec archive (merge deltas into openspec/specs/, archive change)
     Agent->>Git: Merge --ff-only to main
     Agent->>Human: Present Gate 6 (Shipped)
 ```
 
 ### Gate 0: Research & Tradeoffs
-- **Artifact**: `specs/features/<id>-<slug>/research.md`
+- **Artifact**: `openspec/changes/<id>-<slug>/research.md`
 - **Goal**: Investigate 2–3 viable technical options, verify ground truth in code/docs, identify breaking changes, and recommend an approach before writing code.
 - **Decision**:
   - **Go**: Update `specs/ROADMAP.md` to `🚀 In Progress` via chore lane; proceed to Gate 1.
-  - **No-Go**: Commit `research.md` to `specs/archive/<id>-<slug>/`, mark `❌ Dropped` in roadmap with rationale via chore lane, and delete the feature branch.
+  - **No-Go**: Commit `research.md` to `openspec/changes/archive/<id>-<slug>/`, mark `❌ Dropped` in roadmap with rationale via chore lane, and delete the feature branch.
 
 ### Gate 1: Proposal & YAGNI Boundaries
-- **Artifact**: `specs/features/<id>-<slug>/proposal.md`
+- **Artifact**: `openspec/changes/<id>-<slug>/proposal.md`
 - **Goal**: Lock down the problem, user stories, quantifiable success metrics, and strict **Out-of-Scope (YAGNI)** boundaries.
 - **Rule**: Out-of-Scope items in `proposal.md` are binding prohibitions for the remainder of the feature.
 
 ### Gate 2: Full Capability Specifications
-- **Artifact**: `specs/features/<id>-<slug>/specs/<capability>/spec.md`
+- **Artifact**: `openspec/changes/<id>-<slug>/specs/<capability>/spec.md`
 - **Goal**: Formalize behavioral requirements (`REQ-*`), non-functional requirements (`NFR-*`), and Given/When/Then scenarios.
-- **Rule**: **Full copy, never deltas**. If modifying an existing capability, copy `specs/living/<capability>/spec.md` into the feature directory and edit it in full. Gate 6 will overwrite living specs in one atomic step.
+- **Rule**: **Delta specs**. Write `## ADDED|MODIFIED|REMOVED Requirements` with `### Requirement: REQ-<DOMAIN>-<N> <name>` headers; MODIFIED/REMOVED repeat the existing header exactly. `openspec archive` merges the deltas into `openspec/specs/` at Gate 6.
 
 ### Gate 3: Architecture & Design
-- **Artifact**: `specs/features/<id>-<slug>/design.md`
+- **Artifact**: `openspec/changes/<id>-<slug>/design.md`
 - **Goal**: Define domain boundaries (Pure Core vs. I/O Shell), data structures, memory/latency budgets, and error recovery contracts.
 - **Rule**: Core domain logic must have zero dependencies on I/O, network, or frameworks.
 
 ### Gate 4: Tasks DAG & Stream Partitioning
-- **Artifact**: `specs/features/<id>-<slug>/tasks.md`
+- **Artifact**: `openspec/changes/<id>-<slug>/tasks.md`
 - **Goal**: Decompose design into an ordered Directed Acyclic Graph (DAG) of vertical slices.
 - **Rule**: Group independent tasks into parallel worktree streams (e.g., Stream A: Core Parser, Stream B: Serializer). Dependent tasks execute sequentially.
 
@@ -179,10 +179,9 @@ Each slice `x` runs three non-negotiable steps:
 ### Gate 6: Living Spec Sync, Archive & Merge
 1. Ensure all stream worktrees are merged, removed, and pruned (`git worktree prune`).
 2. Rebase feature branch onto `main` and re-run all test and mutation rails.
-3. Sync full capability spec to `specs/living/<capability>/spec.md` (safe overwrite).
-4. Move research and planning artifacts to `specs/archive/<id>-<slug>/`.
-5. Merge feature branch into `main` via `git merge --ff-only`.
-6. Mark item `✅ Shipped` in `specs/ROADMAP.md` via chore lane.
+3. Run `openspec validate <change>`, then `openspec archive <id>-<slug> --yes` (merges deltas into `openspec/specs/` and archives the change to `openspec/changes/archive/`).
+4. Merge feature branch into `main` via `git merge --ff-only`.
+5. Mark item `✅ Shipped` in `specs/ROADMAP.md` via chore lane.
 
 ---
 
@@ -207,7 +206,7 @@ flowchart LR
    - Do not commit the red test alone.
 3. **Gate B3 (Green Fix, Spec Sync & Cleanup)**:
    - Implement the minimal fix to turn the test green (Ponytail discipline).
-   - If the bug altered capability requirements, update the corresponding `specs/living/<capability>/spec.md`.
+   - If the bug altered capability requirements, update the corresponding `openspec/specs/<capability>/spec.md`.
    - Commit regression test + fix + living spec together in a single atomic commit.
    - Rebase onto `main`, merge `--ff-only`.
    - Remove worktree: `git worktree remove .worktrees/fix-<slug>`, delete branch `git branch -d fix/<slug>`, and run `git worktree prune`.
@@ -296,7 +295,7 @@ When pair-programming or coordinating agents:
 | :--- | :--- | :--- |
 | **Direct commit on `main`** | Contaminates production, bypasses rebase verification | Enforced by pre-commit hook; checkout dedicated lane branch |
 | **Committing Red tests alone** | Leaves broken commits in git history, breaks bisecting | Commit Red test together with Green implementation |
-| **Partial delta spec** | Creates drift and fragmented ground truth | Full copy of capability spec; atomic overwrite at Gate 6 |
+| **Full-copy spec duplicates** | Duplicates ground truth and drifts from OpenSpec | Delta specs merged by `openspec archive` at Gate 6 |
 | **Surviving mutant excuses** | Surviving mutants prove missing assertions or dead code | Kill mutant with test, delete dead code, or restructure |
 | **Subagent gate self-approval** | Eliminates human-in-the-loop safety | Halt and escalate to orchestrating agent for human sign-off |
 | **Stale worktrees lingering** | Causes `.git/index.lock` collisions and disk bloat | Run `git worktree remove` and `git worktree prune` after every merge |

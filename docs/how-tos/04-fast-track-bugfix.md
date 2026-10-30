@@ -17,7 +17,7 @@ When a regression, runtime panic, or dogfood defect is discovered, this guide de
 1. Copy the bug report template:
    ```bash
    date_str=$(date +%Y-%m-%d)
-   cp specs/templates/bug-report.md "specs/bug-reports/${date_str}-token-expiry-panic.md"
+   cp openspec/spec-rails/bug-report.md "specs/bug-reports/${date_str}-token-expiry-panic.md"
    ```
 2. Document:
    - Component affected

@@ -100,6 +100,7 @@ assert_eq "schema: spec-rails" "$(cat "$P/openspec/config.yaml")" "config create
 assert_file_exists "$P/.pre-commit-config.yaml" "pre-commit config installed"
 assert_file_exists "$P/.github/workflows/spec-rails-ci.yml" "CI workflow installed"
 assert_file_exists "$P/openspec/spec-rails/mutation/cargo-mutants.toml" "mutation template installed"
+assert_file_exists "$P/openspec/spec-rails/bug-report.md" "bug-report template installed"
 assert_file_exists "$P/openspec/spec-rails/mutation/stryker.config.json" "stryker template installed"
 assert_file_exists "$P/openspec/spec-rails/mutation/mutmut.ini" "mutmut template installed"
 assert_file_exists "$P/.git/hooks/pre-commit" "git hook installed"

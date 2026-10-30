@@ -22,10 +22,10 @@ The AI coding agent natively reads markdown, validates sections, and moves files
   - Gate 2: `spec.md` has uniquely keyed `REQ-*`, `NFR-*`, and Given/When/Then scenarios.
   - Gate 3: `design.md` has boundary rules (Pure Core vs I/O Shell) and performance budgets.
   - Gate 4: `tasks.md` has DAG and multi-agent stream worktrees identified.
-- **Gate 6 Spec Sync & Archival**: When a feature completes, agent executes standard shell commands:
+- **Gate 6 Spec Sync & Archival**: When a feature completes, agent runs:
   ```bash
-  cp specs/features/<feat>/specs/* specs/living/
-  git mv specs/features/<feat> specs/archive/<feat>
+  openspec validate <feat>
+  openspec archive <feat> --yes
   ```
 
 ---
@@ -36,7 +36,7 @@ A pure GitHub Actions workflow with zero custom binaries:
 
 1. **Spec-to-Code Audit**:
    - Uses `git diff --name-only origin/main...HEAD`
-   - If production code is modified, fails unless `specs/features/` or `specs/bug-reports/` is also modified.
+   - If production code is modified, fails unless `openspec/changes/` or `specs/bug-reports/` is also modified.
 2. **Pre-Commit Linting**:
    - Runs `pre-commit run --all-files`.
 3. **Testing & Mutation Rails**:

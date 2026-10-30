@@ -28,17 +28,17 @@ Follow [specs/WORKFLOW.md](../../specs/WORKFLOW.md) and copy templates from [tem
 
 ## 2. Gate Execution Checklist
 
-1. **Gate 0 (Research & Tradeoffs)**: Copy [templates/research.md](../../templates/research.md) $\rightarrow$ `specs/features/<id>-<slug>/research.md`. Present 2–3 options, tradeoffs, and breaking changes. Stop for human developer decision.
+1. **Gate 0 (Research & Tradeoffs)**: Copy [templates/research.md](../../templates/research.md) $\rightarrow$ `openspec/changes/<id>-<slug>/research.md`. Present 2–3 options, tradeoffs, and breaking changes. Stop for human developer decision.
    - If **Go**: Update `specs/ROADMAP.md` to `🚀 In Progress` via `chore/roadmap-<id>`.
-   - If **No-Go**: Commit `research.md` to `specs/archive/<id>-<slug>/`, mark `❌ Dropped` in `specs/ROADMAP.md` with rationale via `chore/roadmap-<id>`, and prune feature branch.
-2. **Gate 1 (Proposal)**: Copy [templates/proposal.md](../../templates/proposal.md) $\rightarrow$ `specs/features/<id>-<slug>/proposal.md` based on chosen option. Stop for human review.
-3. **Gate 2 (Specs)**: Full capability specs (never partial deltas). If modifying existing capability, start from `specs/living/<cap>/spec.md`. Stop for human review.
-4. **Gate 3 (Design)**: Copy [templates/design.md](../../templates/design.md) $\rightarrow$ `specs/features/<id>-<slug>/design.md`. Stop for human review.
-5. **Gate 4 (Tasks)**: Copy [templates/tasks.md](../../templates/tasks.md) $\rightarrow$ `specs/features/<id>-<slug>/tasks.md` with DAG and worktree streams. Stop for human review.
+   - If **No-Go**: Commit `research.md` to `openspec/changes/archive/<id>-<slug>/`, mark `❌ Dropped` in `specs/ROADMAP.md` with rationale via `chore/roadmap-<id>`, and prune feature branch.
+2. **Gate 1 (Proposal)**: Copy [templates/proposal.md](../../templates/proposal.md) $\rightarrow$ `openspec/changes/<id>-<slug>/proposal.md` based on chosen option. Stop for human review.
+3. **Gate 2 (Specs)**: OpenSpec delta specs (`### Requirement: REQ-X-N name`, MUST/SHALL, at least one scenario). MODIFIED/REMOVED repeat the existing header exactly. Stop for human review.
+4. **Gate 3 (Design)**: Copy [templates/design.md](../../templates/design.md) $\rightarrow$ `openspec/changes/<id>-<slug>/design.md`. Stop for human review.
+5. **Gate 4 (Tasks)**: Copy [templates/tasks.md](../../templates/tasks.md) $\rightarrow$ `openspec/changes/<id>-<slug>/tasks.md` with DAG and worktree streams. Stop for human review.
 6. **Apply (Gate 5.x)**: Per vertical slice:
    - **5.x-A**: Write BDD `.feature` scenarios $\rightarrow$ **Stop for Gate 5.x human approval**.
    - **5.x-B**: Write failing unit tests (`Red`) tested locally, then implement minimal code (`Green`). Commit tests + code together. Line & branch coverage $\ge 95\%$.
    - **5.x-C**: Run mutation testing $\rightarrow$ achieve $100\%$ kill score on core logic (no exemptions: kill, delete dead code, or restructure equivalent mutants).
-7. **Gate 6 (Archive & Merge)**: Ensure all stream worktrees are merged, removed, and pruned (`git worktree prune`). Rebase onto `main`, re-verify rails, sync specs to `specs/living/` (safe overwrite), archive to `specs/archive/<id>-<slug>/`, merge `--ff-only`, and update `specs/ROADMAP.md` to `✅ Shipped`.
+7. **Gate 6 (Archive & Merge)**: Ensure all stream worktrees are merged, removed, and pruned (`git worktree prune`). Rebase onto `main`, re-verify rails, run `openspec validate <change>` then `openspec archive <change> --yes` (syncs deltas into `openspec/specs/` and archives the change), merge `--ff-only`, and update `specs/ROADMAP.md` to `✅ Shipped`.
 
-**OpenSpec projects** (`openspec/` present, schema `spec-rails`): create changes with `openspec new change`, write Gate 2 as delta specs (`### Requirement: REQ-X-N name`, MUST/SHALL), run `openspec validate` after stream rebases, and replace the copy/move steps of Gate 6 with `openspec archive <change>`. Run `spec-rails-check` before committing. See `specs/WORKFLOW.md` §7.
+Create changes with `openspec new change`, run `openspec validate` after stream rebases, and run `spec-rails-check` before committing. See `specs/WORKFLOW.md` §7.

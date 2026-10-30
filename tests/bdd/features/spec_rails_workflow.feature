@@ -7,7 +7,7 @@ Feature: Spec-Rails Workflow Lifecycle
     Given a fresh git repository
     When I initialize Spec-Rails using "bin/spec-rails"
     Then the directory "specs/" should contain "WORKFLOW.md" and "ROADMAP.md"
-    And the directories "specs/features", "specs/living", "specs/archive", "specs/bug-reports" should exist
+    And the directories "openspec/changes", "openspec/specs", "openspec/changes/archive", "specs/bug-reports" should exist
     And the file ".pre-commit-config.yaml" should be configured
     And ".worktrees/" should be ignored in ".gitignore"
 
@@ -15,7 +15,7 @@ Feature: Spec-Rails Workflow Lifecycle
     Given an initialized Spec-Rails repository
     When a developer selects item "W1.1" from "specs/ROADMAP.md"
     And starts feature branch "feat/w1.1-core-contracts"
-    And conducts Gate 0 research in "specs/features/w1.1-core-contracts/research.md"
+    And conducts Gate 0 research in "openspec/changes/w1.1-core-contracts/research.md"
     And developer approves Option A
     Then the status in "specs/ROADMAP.md" can be updated to In Progress
     And Gate 1 proposal and Gate 2 full capability specs can be drafted
@@ -24,7 +24,7 @@ Feature: Spec-Rails Workflow Lifecycle
     Given an initialized Spec-Rails repository
     When a developer researches item "W1.2" on branch "feat/w1.2-unfeasible-service"
     And Gate 0 research reveals the feature is unfeasible
-    Then the research artifact is archived to "specs/archive/w1.2-unfeasible-service/research.md"
+    Then the research artifact is archived to "openspec/changes/archive/w1.2-unfeasible-service/research.md"
     And "specs/ROADMAP.md" records status "❌ Dropped" with rationale
     And the feature branch is deleted with zero production code changes
 

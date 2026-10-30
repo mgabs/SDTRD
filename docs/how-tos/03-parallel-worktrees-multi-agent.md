@@ -6,7 +6,7 @@ When a feature contains orthogonal tasks with zero mutual dependencies, Spec-Rai
 
 ## 1. Identify Orthogonal Streams (Gate 4)
 
-In `specs/features/<feature>/tasks.md`, analyze the dependency DAG:
+In `openspec/changes/<feature>/tasks.md`, analyze the dependency DAG:
 
 ```mermaid
 flowchart TD

@@ -76,7 +76,7 @@ else
 fi
 
 # Scenarios below simulate the legacy specs/ lifecycle without the installer
-mkdir -p specs/features specs/living specs/archive specs/bug-reports specs/templates
+mkdir -p openspec/changes openspec/specs openspec/changes/archive specs/bug-reports specs/templates
 cp "$SPEC_RAILS_ROOT/templates/"*.md specs/templates/
 cp "$SPEC_RAILS_ROOT/templates/roadmap.md" specs/ROADMAP.md
 rm -rf "$STUB_DIR"
@@ -92,12 +92,12 @@ echo ""
 echo "Scenario 2: Feature Gate 0 Go decision advances to Proposal and preserves living specs"
 # 1. Start Gate 0 Research on feature branch
 git checkout -q -b feat/w1.1-core-contracts
-mkdir -p specs/features/w1.1-core-contracts/specs
-cp specs/templates/research.md specs/features/w1.1-core-contracts/research.md
+mkdir -p openspec/changes/w1.1-core-contracts/specs
+cp specs/templates/research.md openspec/changes/w1.1-core-contracts/research.md
 
 # Fill in Gate 0 approval: Option A chosen
-printf "\n## Decision\n- [x] Option A: Standard Library\n" >> specs/features/w1.1-core-contracts/research.md
-git add specs/features/w1.1-core-contracts/research.md
+printf "\n## Decision\n- [x] Option A: Standard Library\n" >> openspec/changes/w1.1-core-contracts/research.md
+git add openspec/changes/w1.1-core-contracts/research.md
 git commit -q -m "docs(w1.1): Gate 0 research - Option A chosen"
 
 # 2. Update ROADMAP.md to In Progress via chore lane on main
@@ -118,8 +118,8 @@ git checkout -q feat/w1.1-core-contracts
 git rebase -q main
 
 # Create full capability spec
-mkdir -p specs/features/w1.1-core-contracts/specs/contracts
-cat <<EOF > specs/features/w1.1-core-contracts/specs/contracts/spec.md
+mkdir -p openspec/changes/w1.1-core-contracts/specs/contracts
+cat <<EOF > openspec/changes/w1.1-core-contracts/specs/contracts/spec.md
 # Capability: contracts
 - REQ-CONTRACT-1: System must validate tokens deterministically.
 EOF
@@ -130,45 +130,45 @@ printf 'def validate(t): return len(t) > 0\n' > src/contracts.py
 printf 'from src.contracts import validate\ndef test_val(): assert validate("abc")\n' > tests/test_contracts.py
 
 # Tasks completed
-cat <<EOF > specs/features/w1.1-core-contracts/tasks.md
+cat <<EOF > openspec/changes/w1.1-core-contracts/tasks.md
 # Tasks: w1.1-core-contracts
 - [x] 1.1 Core models implemented and verified
 EOF
 
-git add specs/ src/ tests/
+git add specs/ openspec/ src/ tests/
 git commit -q -m "feat(w1.1): implement verified token contracts"
 
 # 4. Gate 6: Sync to living, archive lifecycle, rebase on main, merge --ff-only
-cp -R specs/features/w1.1-core-contracts/specs/. specs/living/
-git mv specs/features/w1.1-core-contracts specs/archive/w1.1-core-contracts
-git add specs/
+cp -R openspec/changes/w1.1-core-contracts/specs/. openspec/specs/
+git mv openspec/changes/w1.1-core-contracts openspec/changes/archive/w1.1-core-contracts
+git add openspec/
 git commit -q -m "chore(w1.1): sync specs to living and archive lifecycle"
 
 git checkout -q main
 git merge -q --ff-only feat/w1.1-core-contracts
 git branch -q -d feat/w1.1-core-contracts
 
-assert_file "specs/living/contracts/spec.md" "Living spec promoted to specs/living/contracts/spec.md"
-assert_file "specs/archive/w1.1-core-contracts/research.md" "Research archived in specs/archive/w1.1-core-contracts/"
+assert_file "openspec/specs/contracts/spec.md" "Living spec promoted to openspec/specs/contracts/spec.md"
+assert_file "openspec/changes/archive/w1.1-core-contracts/research.md" "Research archived in openspec/changes/archive/w1.1-core-contracts/"
 assert_file "src/contracts.py" "Production code merged to main"
 
 echo ""
 echo "Scenario 3: Feature Gate 0 No-Go archives research and drops item without dirtying code"
 git checkout -q -b feat/w1.2-unfeasible
-mkdir -p specs/features/w1.2-unfeasible
-cp specs/templates/research.md specs/features/w1.2-unfeasible/research.md
-printf "\n## Decision\n- [x] No-Go: Rejected due to prohibitive latency\n" >> specs/features/w1.2-unfeasible/research.md
-git add specs/features/w1.2-unfeasible/research.md
+mkdir -p openspec/changes/w1.2-unfeasible
+cp specs/templates/research.md openspec/changes/w1.2-unfeasible/research.md
+printf "\n## Decision\n- [x] No-Go: Rejected due to prohibitive latency\n" >> openspec/changes/w1.2-unfeasible/research.md
+git add openspec/changes/w1.2-unfeasible/research.md
 git commit -q -m "docs(w1.2): Gate 0 research concludes No-Go"
 
 # No-Go protocol: archive research to main via chore branch, drop in ROADMAP, prune feat branch
 git checkout -q main
 git checkout -q -b chore/roadmap-w1.2-drop
-mkdir -p specs/archive/w1.2-unfeasible
-git show feat/w1.2-unfeasible:specs/features/w1.2-unfeasible/research.md > specs/archive/w1.2-unfeasible/research.md
+mkdir -p openspec/changes/archive/w1.2-unfeasible
+git show feat/w1.2-unfeasible:openspec/changes/w1.2-unfeasible/research.md > openspec/changes/archive/w1.2-unfeasible/research.md
 sed -i '' -e 's/| \*\*W1.2\*\* | Data Ingestion | M | W1.1 | ⬜/| **W1.2** | Data Ingestion | M | W1.1 | ❌/' specs/ROADMAP.md || \
   sed -i -e 's/| \*\*W1.2\*\* | Data Ingestion | M | W1.1 | ⬜/| **W1.2** | Data Ingestion | M | W1.1 | ❌/' specs/ROADMAP.md
-git add specs/archive/w1.2-unfeasible specs/ROADMAP.md
+git add openspec/changes/archive/w1.2-unfeasible specs/ROADMAP.md
 git commit -q -m "chore: archive W1.2 research as No-Go and mark dropped in ROADMAP"
 
 git checkout -q main
@@ -176,8 +176,8 @@ git merge -q --ff-only chore/roadmap-w1.2-drop
 git branch -q -d chore/roadmap-w1.2-drop
 git branch -q -D feat/w1.2-unfeasible
 
-assert_file "specs/archive/w1.2-unfeasible/research.md" "Negative research archived for institutional memory"
-if [ ! -d "specs/features/w1.2-unfeasible" ]; then
+assert_file "openspec/changes/archive/w1.2-unfeasible/research.md" "Negative research archived for institutional memory"
+if [ ! -d "openspec/changes/w1.2-unfeasible" ]; then
   step_pass "Unfeasible feature branch pruned cleanly"
 else
   step_fail "Unfeasible feature branch pruned cleanly" "feature directory still present"
@@ -233,12 +233,12 @@ def validate(t):
 EOF
 
 # Update living spec inside the worktree (zero contamination of parent working tree)
-cat <<EOF >> specs/living/contracts/spec.md
+cat <<EOF >> openspec/specs/contracts/spec.md
 - REQ-CONTRACT-2: Empty token strings MUST evaluate to False.
 EOF
 
 # Commit Green fix + Red test together (Rule 4)
-git add src/ tests/ specs/
+git add src/ tests/ openspec/
 git commit -q -m "fix: reject empty tokens and update living spec"
 
 # Merge per Rule 2
@@ -256,8 +256,8 @@ else
   step_fail "Worktree removed and pruned cleanly" "expected 1 worktree, found $WT_COUNT"
 fi
 
-assert_file "specs/living/contracts/spec.md" "Living spec contains updated bugfix requirement"
-if grep -q "REQ-CONTRACT-2" specs/living/contracts/spec.md; then
+assert_file "openspec/specs/contracts/spec.md" "Living spec contains updated bugfix requirement"
+if grep -q "REQ-CONTRACT-2" openspec/specs/contracts/spec.md; then
   step_pass "Living spec updated with REQ-CONTRACT-2"
 else
   step_fail "Living spec updated with REQ-CONTRACT-2" "REQ-CONTRACT-2 missing"

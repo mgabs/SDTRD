@@ -44,6 +44,6 @@ flowchart TD
 - [ ] Merge completed stream worktrees (rebase onto feature branch, re-verify, `git merge --ff-only`), remove worktrees, and prune (`git worktree prune`). Verify `git worktree list` shows only the repository root.
 - [ ] Full test suite passes with $\ge 95\%$ line and branch coverage.
 - [ ] Full mutation suite achieves $100\%$ kill score on core logic.
-- [ ] Sync delta specs into `specs/living/`.
+- [ ] Sync delta specs into `openspec/specs/`.
 - [ ] **Gate 4 Approval**: Tasks breakdown approved by human before writing test code.
 - [ ] **Gate 6 Approval**: Final sync and archive sign-off.

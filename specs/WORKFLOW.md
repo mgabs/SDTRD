@@ -12,7 +12,7 @@ Every change travels through exactly one lane. Pick it before touching anything.
 | **Bugfix** | `fix/<slug>` | Merged behavior contradicts spec, docs, or user intent | B1 → B3 (§3) |
 | **Chore** | `chore/<slug>` | Zero behavior change: docs, formatting, tooling/CI config, refactors that keep every existing test unchanged | None (Rule 5) |
 
-- `<id>` is the work item ID from `specs/ROADMAP.md`, lowercased (e.g., roadmap `W1.2` → `feat/w1.2-data-ingestion`, `specs/features/w1.2-data-ingestion/`).
+- `<id>` is the work item ID from `specs/ROADMAP.md`, lowercased (e.g., roadmap `W1.2` → `feat/w1.2-data-ingestion`, `openspec/changes/w1.2-data-ingestion/`).
 - If a chore turns out to change behavior, stop and restart in the Feature or Bugfix lane.
 
 ### Rule 1: Never Commit on `main`
@@ -94,7 +94,7 @@ A gate passes only when the agent, after explicit human approval, ticks the arti
 | :--- | :--- |
 | Gate 0 start | `⬜` → `🔬 In Research` |
 | Gate 0 decision: Go | `🔬` → `🚀 In Progress` |
-| Gate 0 decision: No-Go | `🔬` → `❌ Dropped` + rationale; also commits `research.md` to `specs/archive/<id>-<slug>/` |
+| Gate 0 decision: No-Go | `🔬` → `❌ Dropped` + rationale; also commits `research.md` to `openspec/changes/archive/<id>-<slug>/` |
 | Gate 6 end (after feature merge) | `🚀` → `✅ Shipped` |
 
 ```mermaid
@@ -135,32 +135,33 @@ flowchart TD
 
 ### Gate 0: Research & Tradeoffs
 - **Purpose**: Explore briefly and let the developer decide *before* committing to build, so nothing gets built on opinionated, unverified assumptions.
-- **Artifact**: `specs/features/<id>-<slug>/research.md`
+- **Artifact**: `openspec/changes/<id>-<slug>/research.md`
 - **Mandatory Sections**:
   - **Intent & Ground Truth**: Problem, existing constraints, facts verified in the codebase or official docs.
   - **Explored Options (2–3)**: e.g., idiomatic library vs minimal in-house vs specialized.
   - **Tradeoff Matrix**: Complexity, dependencies, performance, maintenance, blast radius.
-  - **Breaking Changes & Deprecations**: Every `REQ-*` / `NFR-*` in `specs/living/` that will be modified, superseded, or deprecated.
+  - **Breaking Changes & Deprecations**: Every `REQ-*` / `NFR-*` in `openspec/specs/` that will be modified, superseded, or deprecated.
   - **Recommendation**: 1–2 sentences, YAGNI-first.
 - **Gate**: Developer decides **Go** (option chosen → Gate 1) or **No-Go** (archive research to `main` via chore, mark `❌`, delete the feature branch).
 
 ### Gate 1: Proposal
-- **Artifact**: `specs/features/<id>-<slug>/proposal.md`
+- **Artifact**: `openspec/changes/<id>-<slug>/proposal.md`
 - **Mandatory Sections**: Intent, Problem Statement, Scope (In-Scope / Out-of-Scope YAGNI), Success Metrics, Assumptions (`ASM-GEN-*`), built on the option chosen at Gate 0.
 - **Gate**: Human approval before drafting specs.
 
 ### Gate 2: Specifications
-- **Artifacts**: `specs/features/<id>-<slug>/specs/<capability>/spec.md`
-- **Full-Copy Rule** (legacy layout; replaced by delta specs in OpenSpec projects, see §7): Feature specs are **complete** capability specs, never partial deltas.
-  - **Existing capability**: First copy `specs/living/<capability>/spec.md` into the feature dir, then edit it in place. Deprecated keys stay, marked `[DEPRECATED by <id>]`; keys are never reused.
-  - **New capability**: New file.
-  - This makes Gate 6 sync a safe overwrite.
+- **Artifacts**: `openspec/changes/<id>-<slug>/specs/<capability>/spec.md`
+- **Delta Specs**: Feature specs are OpenSpec delta specs (`## ADDED|MODIFIED|REMOVED Requirements`), never full copies.
+  - **Existing capability**: MODIFIED/REMOVED deltas repeat the existing requirement header exactly. Deprecated keys stay, marked `[DEPRECATED by <id>]`; keys are never reused.
+  - **New capability**: ADDED requirements, starting with `## Purpose`.
+  - Headers are `### Requirement: REQ-<DOMAIN>-<N> <name>`; bodies contain `MUST`/`SHALL`; every requirement has at least one `#### Scenario:`.
+  - `openspec archive` merges the deltas into `openspec/specs/` at Gate 6.
 - **Mandatory Sections**: Functional Requirements (`REQ-*`), Non-Functional Requirements & Budgets (`NFR-*`), Assumptions (`ASM-*`), Edge Cases & Errors, Behavioral Scenarios (`Given / When / Then`).
 - **Traceability**: Every requirement uniquely keyed (`REQ-<DOMAIN>-<N>`, `NFR-<DOMAIN>-<N>`).
 - **Gate**: Human approval before technical design.
 
 ### Gate 3: Architecture & Design
-- **Artifact**: `specs/features/<id>-<slug>/design.md`
+- **Artifact**: `openspec/changes/<id>-<slug>/design.md`
 - **Mandatory Sections**: Overview & Invariants; Domain Models, State & Interface Contracts; Architecture Diagrams & Data Flow; Boundary Rules (Pure Core vs I/O Shell); Concurrency, Latency & Resource Budgets (matching `NFR-*`); Testing Strategy.
 - **Domain-Specific Baselines**:
   - **UI / Interactive**: Frame deadlines (e.g., $< 16\text{ms}$), input latency budgets, background I/O offloading.
@@ -168,7 +169,7 @@ flowchart TD
 - **Gate**: Human approval before task breakdown.
 
 ### Gate 4: Tasks & DAG
-- **Artifact**: `specs/features/<id>-<slug>/tasks.md`
+- **Artifact**: `openspec/changes/<id>-<slug>/tasks.md`
 - **Mandatory Sections**: Dependency DAG; Streams with worktrees (`.worktrees/<id>-<stream>`); test-first order per slice (BDD → Gate 5.x → Red → Green → Coverage → Mutation); Integration & Rebase Plan.
 - **Gate**: Human approval before spawning worktrees or writing tests.
 
@@ -206,7 +207,7 @@ flowchart TD
 
 ### Gate B3: Sign-off & Merge
 - Apply the minimal fix (Green), run the full suite, commit test + fix together.
-- **Spec & doc integrity**: If the defect stems from or affects living specs or docs, fix `specs/living/` and docs in the same branch.
+- **Spec & doc integrity**: If the defect stems from or affects living specs or docs, fix `openspec/specs/` and docs in the same branch.
 - Human reviews the final diff and test output.
 - Merge per Rule 2, clean up worktree completely (`git worktree remove .worktrees/fix-<slug>`, `git branch -d fix/<slug>`, `git worktree prune`), mark the report `Resolved` with the commit hash, and rebase active feature branches onto `main`.
 
@@ -266,14 +267,11 @@ All steps on the feature branch unless stated otherwise:
 2. Rebase the feature branch onto `main` (Rule 2).
 3. Full test suite: $100\%$ pass, $\ge 95\%$ line and branch coverage.
 4. Full-project mutation suite: $100\%$ kill score on core logic.
-5. Sync specs (safe overwrite, per the Gate 2 full-copy rule):
-   ```bash
-   cp -R specs/features/<id>-<slug>/specs/. specs/living/
-   ```
+5. Run `openspec validate <change>` (also required after every stream rebase).
 6. Tick every item in `tasks.md` and the Gate 6 box.
-7. Archive the lifecycle artifacts:
+7. Sync and archive in one step (no Spec-Rails-owned copy or move):
    ```bash
-   git mv specs/features/<id>-<slug> specs/archive/<id>-<slug>
+   openspec archive <id>-<slug> --yes
    ```
 8. Commit, then merge into `main`:
    ```bash
@@ -283,14 +281,11 @@ All steps on the feature branch unless stated otherwise:
    ```
 9. Mark `✅ Shipped` in `specs/ROADMAP.md` via `chore/roadmap-<id>` (§2).
 
-## 7. OpenSpec Addon Mode
+## 7. OpenSpec Layout & Enforcement
 
-When Spec-Rails is installed on an OpenSpec project (`spec-rails [init] [dir]`, requires OpenSpec ≥ 1.15.0 and `jq`), OpenSpec owns the artifact graph, specs and archive; Spec-Rails supplies the `spec-rails` schema (`research → proposal → specs → design → tasks`), gates, lanes and testing rails. Lanes, human gates, worktrees, Red/Green and mutation rules (§1–§5) are unchanged. Differences:
+Spec-Rails is an addon on an OpenSpec project (`spec-rails [init] [dir]`, requires OpenSpec ≥ 1.15.0 and `jq`). OpenSpec owns the artifact graph, specs and archive; Spec-Rails supplies the `spec-rails` schema (`research → proposal → specs → design → tasks`), gates, lanes and testing rails.
 
-- **Layout**: changes live in `openspec/changes/<change>/`, capabilities in `openspec/specs/<capability>/spec.md`. `specs/{features,living,archive}` are not used; `specs/ROADMAP.md` and `specs/bug-reports/` remain.
-- **Delta specs replace the Full-Copy Rule (Gate 2)**: write `## ADDED|MODIFIED|REMOVED Requirements` deltas under `specs/<capability>/spec.md`. Headers are `### Requirement: REQ-<DOMAIN>-<N> <name>`; MODIFIED/REMOVED repeat the header exactly; bodies contain `MUST`/`SHALL`. Keys are never reused.
+- **Layout**: changes live in `openspec/changes/<id>-<slug>/`, capabilities in `openspec/specs/<capability>/spec.md`, finished changes in `openspec/changes/archive/`. `specs/ROADMAP.md`, `specs/WORKFLOW.md` and `specs/bug-reports/` stay under `specs/`.
 - **Gates**: each artifact template ends with an unticked `## Review Gate` box. A human ticks it and commits it before the next artifact is created. `spec-rails-check` (pre-commit and CI) fails if an artifact exists whose upstream gate is unticked, and fails commits on `main`/`master`.
 - **Streams**: after rebasing a stream onto the feature branch, run `openspec validate <change>` in addition to the test suite.
-- **Gate 6**: steps 5 and 7 become `openspec archive <change>`, which syncs deltas into `openspec/specs/` and archives the change. No Spec-Rails-owned copy or move step.
 - **Update survival**: Spec-Rails rules live in `openspec/spec-rails/`, outside files regenerated by `openspec update`.
-- **This repo** still uses the legacy layout until roadmap item W3.8 migrates it.

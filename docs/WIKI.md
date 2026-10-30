@@ -26,7 +26,7 @@ For the comprehensive operational handbook, see [WAY_OF_WORKING.md](WAY_OF_WORKI
 
 ### 1.4 Living Specifications
 - Specs are not discarded design documents.
-- Feature specs are full copies of a capability's spec (never partial deltas), so syncing them into `specs/living/` at Gate 6 is a safe overwrite that keeps an evergreen, authoritative ground truth.
+- Feature specs are OpenSpec delta specs; `openspec archive` merges them into `openspec/specs/` at Gate 6, keeping an evergreen, authoritative ground truth with no hand-copied files.
 
 ### 1.5 Pre-Commit Verification & Zero-Bypass Protocol
 - Every project must maintain active pre-commit hooks (`.pre-commit-config.yaml`).
@@ -60,13 +60,13 @@ flowchart TD
 
 | Gate | Name | Artifact | Required Content | Next Step |
 | :--- | :--- | :--- | :--- | :--- |
-| **Gate 0** | Research & Tradeoffs | `specs/features/<feat>/research.md` | Ground truth, 2–3 explored options, tradeoff matrix, recommendation, developer decision. | Draft Proposal (Gate 1) |
-| **Gate 1** | Proposal Review | `specs/features/<feat>/proposal.md` | Intent, Problem Statement, Scope (In/Out-of-scope), Success Metrics, Assumptions (`ASM-GEN-*`). | Draft Specifications |
-| **Gate 2** | Specifications Review | `specs/features/<feat>/specs/<cap>/spec.md` | Traceable Requirements (`REQ-*`), Non-Functional Budgets (`NFR-*`), Given/When/Then Scenarios. | Technical Design |
-| **Gate 3** | Architecture Review | `specs/features/<feat>/design.md` | Overview, Domain Contracts, Boundary Rules, Latency/Allocation Budgets, Test Strategy. | Task Breakdown |
-| **Gate 4** | Tasks Breakdown Review | `specs/features/<feat>/tasks.md` | Dependency DAG, Multi-agent worktree stream partitions, Test-first order of execution. | Launch Worktrees / Apply Phase |
+| **Gate 0** | Research & Tradeoffs | `openspec/changes/<feat>/research.md` | Ground truth, 2–3 explored options, tradeoff matrix, recommendation, developer decision. | Draft Proposal (Gate 1) |
+| **Gate 1** | Proposal Review | `openspec/changes/<feat>/proposal.md` | Intent, Problem Statement, Scope (In/Out-of-scope), Success Metrics, Assumptions (`ASM-GEN-*`). | Draft Specifications |
+| **Gate 2** | Specifications Review | `openspec/changes/<feat>/specs/<cap>/spec.md` | Traceable Requirements (`REQ-*`), Non-Functional Budgets (`NFR-*`), Given/When/Then Scenarios. | Technical Design |
+| **Gate 3** | Architecture Review | `openspec/changes/<feat>/design.md` | Overview, Domain Contracts, Boundary Rules, Latency/Allocation Budgets, Test Strategy. | Task Breakdown |
+| **Gate 4** | Tasks Breakdown Review | `openspec/changes/<feat>/tasks.md` | Dependency DAG, Multi-agent worktree stream partitions, Test-first order of execution. | Launch Worktrees / Apply Phase |
 | **Gate 5.x**| Slice Behavior Review | `tests/bdd/features/*.feature` | Gherkin scenarios covering all slice requirements before code is written. | Unit Red $\rightarrow$ Code Green |
-| **Gate 6** | Living Sync & Archive | `specs/living/` + `tasks.md` | $\ge 95\%$ coverage, $100\%$ mutation kill, worktrees pruned, delta specs promoted to `specs/living/`. | Feature Complete |
+| **Gate 6** | Living Sync & Archive | `openspec/specs/` + `tasks.md` | $\ge 95\%$ coverage, $100\%$ mutation kill, worktrees pruned, delta specs promoted to `openspec/specs/`. | Feature Complete |
 
 ### 2.2 Bugfix Gate Matrix (Fast-Track)
 

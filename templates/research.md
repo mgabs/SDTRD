@@ -64,5 +64,5 @@
 ## Review Gate: Developer Decision
 - [ ] **Decision**:
   - **Go**: Proceed with Option A | Option B | Option C $\rightarrow$ Open Gate 1 (Proposal)
-  - **No-Go**: Reject all options $\rightarrow$ via a `chore/roadmap-<id>` branch on `main`: commit `research.md` to `specs/archive/<id>-<slug>/` and record `❌ Dropped` + rationale in `specs/ROADMAP.md`; then delete the feature branch.
+  - **No-Go**: Reject all options $\rightarrow$ via a `chore/roadmap-<id>` branch on `main`: commit `research.md` to `openspec/changes/archive/<id>-<slug>/` and record `❌ Dropped` + rationale in `specs/ROADMAP.md`; then delete the feature branch.
 - [ ] **Developer Sign-off**: Approved by human.

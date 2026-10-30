@@ -12,10 +12,10 @@ Never work on `main`. Start a dedicated feature branch:
 git checkout -b feat/w1.1-user-authentication
 ```
 
-Create the feature directory in `specs/features/`:
+Create the feature directory in `openspec/changes/`:
 
 ```bash
-mkdir -p specs/features/w1.1-user-authentication/specs
+mkdir -p openspec/changes/w1.1-user-authentication/specs
 ```
 
 ---
@@ -24,7 +24,7 @@ mkdir -p specs/features/w1.1-user-authentication/specs
 
 1. Copy the research template:
    ```bash
-   cp specs/templates/research.md specs/features/w1.1-user-authentication/research.md
+   cp openspec/schemas/spec-rails/templates/research.md openspec/changes/w1.1-user-authentication/research.md
    ```
 2. Document:
    - **Ground Truth**: Verified constraints in existing codebase and docs.
@@ -39,7 +39,7 @@ mkdir -p specs/features/w1.1-user-authentication/specs
 
 1. Copy the proposal template:
    ```bash
-   cp specs/templates/proposal.md specs/features/w1.1-user-authentication/proposal.md
+   cp openspec/schemas/spec-rails/templates/proposal.md openspec/changes/w1.1-user-authentication/proposal.md
    ```
 2. Fill in:
    - **Intent**: High-level capability summary.
@@ -52,15 +52,12 @@ mkdir -p specs/features/w1.1-user-authentication/specs
 
 ## Step 4: Gate 2 — Specifications
 
-1. For each capability, create a **full** spec (never a partial delta):
-   - **Existing capability** — start from the living spec, then edit in place (mark retired keys `[DEPRECATED by w1.1]`, never reuse keys):
+1. For each capability, write a **delta spec** (`## ADDED|MODIFIED|REMOVED Requirements`):
+   - **Existing capability** — MODIFIED/REMOVED deltas repeat the existing `### Requirement: REQ-... <name>` header exactly (mark retired keys `[DEPRECATED by w1.1]`, never reuse keys).
+   - **New capability** — ADDED requirements, starting from the template:
      ```bash
-     mkdir -p specs/features/w1.1-user-authentication/specs/token-verification
-     cp specs/living/token-verification/spec.md specs/features/w1.1-user-authentication/specs/token-verification/spec.md
-     ```
-   - **New capability** — start from the template:
-     ```bash
-     cp specs/templates/spec.md specs/features/w1.1-user-authentication/specs/token-verification/spec.md
+     mkdir -p openspec/changes/w1.1-user-authentication/specs/token-verification
+     cp openspec/schemas/spec-rails/templates/spec.md openspec/changes/w1.1-user-authentication/specs/token-verification/spec.md
      ```
 2. Fill in:
    - **Functional Requirements**: `REQ-AUTH-1`, `REQ-AUTH-2`, etc.
@@ -74,7 +71,7 @@ mkdir -p specs/features/w1.1-user-authentication/specs
 
 1. Copy the design template:
    ```bash
-   cp specs/templates/design.md specs/features/w1.1-user-authentication/design.md
+   cp openspec/schemas/spec-rails/templates/design.md openspec/changes/w1.1-user-authentication/design.md
    ```
 2. Document:
    - Domain models, state machines, and interfaces.
@@ -88,7 +85,7 @@ mkdir -p specs/features/w1.1-user-authentication/specs
 
 1. Copy the tasks template:
    ```bash
-   cp specs/templates/tasks.md specs/features/w1.1-user-authentication/tasks.md
+   cp openspec/schemas/spec-rails/templates/tasks.md openspec/changes/w1.1-user-authentication/tasks.md
    ```
 2. Structure the DAG into vertical slices and identify orthogonal streams suitable for parallel worktrees.
 3. **Gate 4 Review**: Human approval required before writing any test code.
@@ -116,13 +113,14 @@ For each vertical slice:
 
 1. Merge stream worktrees (rebase + re-verify each, then `--ff-only`) and prune them.
 2. Rebase onto `main`, then run the full test suite and full-project mutation suite.
-3. Promote specs to living (safe overwrite thanks to the full-copy rule):
+3. Validate, then sync and archive in one step:
    ```bash
-   cp -R specs/features/w1.1-user-authentication/specs/. specs/living/
+   openspec validate w1.1-user-authentication
    ```
 4. Tick all tasks and the Gate 6 box in `tasks.md`, archive, commit, and merge:
    ```bash
-   git mv specs/features/w1.1-user-authentication specs/archive/w1.1-user-authentication
+   openspec archive w1.1-user-authentication --yes
+   git add -A
    git commit -m "feat(w1.1): ship user authentication"
    git checkout main
    git merge --ff-only feat/w1.1-user-authentication

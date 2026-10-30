@@ -2,7 +2,7 @@
 
 This guide walks through installing Spec-Rails on an OpenSpec project.
 
-> **Prerequisites**: run `openspec init` first (OpenSpec ≥ 1.15.0 on `PATH`) and install `jq`. The installer exits non-zero and writes nothing otherwise. It is idempotent, sets `schema: spec-rails` in `openspec/config.yaml`, never overwrites an existing `.pre-commit-config.yaml`, and puts agent rules in `openspec/spec-rails/` so `openspec update` leaves them alone. The scaffold listing below describes the legacy layout; see `specs/WORKFLOW.md` §7 for the OpenSpec layout.
+> **Prerequisites**: run `openspec init` first (OpenSpec ≥ 1.15.0 on `PATH`) and install `jq`. The installer exits non-zero and writes nothing otherwise. It is idempotent, sets `schema: spec-rails` in `openspec/config.yaml`, never overwrites an existing `.pre-commit-config.yaml`, and puts agent rules in `openspec/spec-rails/` so `openspec update` leaves them alone.
 
 ---
 
@@ -22,27 +22,23 @@ Or from within your project directory:
 
 ---
 
-## 2. Verify Scaffolding
+## 2. Verify Wiring
 
-The command creates:
+The command wires the project (it does not create `specs/`):
 
 ```text
 your-project/
-├── .gitignore               # Appends .worktrees/ if not present
-├── .pre-commit-config.yaml  # Pre-commit hook configuration
-└── specs/
-    ├── WORKFLOW.md          # Canonical Spec-Rails workflow rules
-    ├── features/            # Active and proposed feature specs
-    ├── bug-reports/         # Fast-track bug reports
-    ├── living/              # Evergreen canonical system specifications
-    └── templates/           # Reusable markdown templates
-        ├── proposal.md      # Gate 1 template
-        ├── spec.md          # Gate 2 template
-        ├── design.md        # Gate 3 template
-        ├── tasks.md         # Gate 4 template
-        ├── bug-report.md    # Gate B1 template
-        └── .pre-commit-config.yaml
+├── .gitignore                          # Appends .worktrees/ if not present
+├── .pre-commit-config.yaml             # Created only if absent
+├── .github/workflows/spec-rails-ci.yml # CI rails + gate/lane check
+├── .git/hooks/pre-commit               # Branch protection, LGTM directives, spec-rails-check
+└── openspec/
+    ├── config.yaml                     # schema: spec-rails (other keys preserved)
+    ├── schemas/spec-rails/             # Schema + artifact templates
+    └── spec-rails/                     # AGENTS.md, spec-rails-check, bug-report.md, mutation/
 ```
+
+Create `specs/ROADMAP.md` from `templates/roadmap.md` in the spec-rails repo if you want a roadmap.
 
 ---
 
@@ -91,6 +87,6 @@ mutants:
 ## 4. Commit Baseline
 
 ```bash
-git add specs/ .gitignore Makefile
+git add openspec/ .github/ .gitignore Makefile
 git commit -m "chore: initialize Spec-Rails workflow and testing rails"
 ```

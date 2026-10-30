@@ -16,7 +16,7 @@ When working in a repository containing `specs/WORKFLOW.md`:
    - Ruthless deletion: delete dead code immediately upon mutation survival. Any code not provably required is dead code.
 2. **Pick a Lane First**: Feature (`feat/<id>-<slug>`, Gates 0–6), Bugfix (`fix/<slug>`, Gates B1–B3), or Chore (`chore/<slug>`, zero behavior change, no gates). Never commit on `main`/`master`.
 3. **Strict Human Gates**: Stop and obtain explicit human approval at every gate. A gate passes only when its Review Gate checkbox is ticked and committed.
-   - **Features**: Gate 0 (`research.md`) → Gate 1 (`proposal.md`) → Gate 2 (`specs/<cap>/spec.md`; full copy in the legacy layout, OpenSpec delta specs when installed on OpenSpec, see WORKFLOW §7) → Gate 3 (`design.md`) → Gate 4 (`tasks.md`) → Gate 5.x (BDD per slice) → Gate 6 (Sync, Archive, Merge; `openspec archive` on OpenSpec projects).
+   - **Features**: Gate 0 (`research.md`) → Gate 1 (`proposal.md`) → Gate 2 (`specs/<cap>/spec.md` OpenSpec delta specs, see WORKFLOW §7) → Gate 3 (`design.md`) → Gate 4 (`tasks.md`) → Gate 5.x (BDD per slice) → Gate 6 (Sync, Archive, Merge; `openspec archive`).
    - **Bugs**: Gate B1 (`specs/bug-reports/<date>-<slug>.md`) → Gate B2 (Red regression test shown, uncommitted) → Gate B3 (Green fix + docs/spec sync + merge).
 4. **Testing Rails**:
    - Red before Green. Red tests are never committed alone; commit them together with Green.

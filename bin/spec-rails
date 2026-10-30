@@ -121,6 +121,7 @@ main() {
     cp "$root/templates/.pre-commit-config.yaml" "$target/.pre-commit-config.yaml"
   fi
   put_file "$root/templates/spec-rails-ci.yml" "$target/.github/workflows/spec-rails-ci.yml"
+  put_file "$root/templates/bug-report.md" "$target/openspec/spec-rails/bug-report.md"
   for m in "$root/templates/mutation/"*; do
     put_file "$m" "$target/openspec/spec-rails/mutation/$(basename -- "$m")"
   done

@@ -20,7 +20,7 @@ Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `sp
 - `🔬 In Research (Gate 0)`: Actively investigating technical feasibility and options.
 - `🚀 In Progress (Gates 1–6)`: Gate 0 Go decision made; active feature branch / worktree streams.
 - `✅ Shipped`: Verified, merged, living specs synced, archived.
-- `❌ Dropped`: Discarded at Gate 0; rationale here, research in `specs/archive/<id>-<slug>/`.
+- `❌ Dropped`: Discarded at Gate 0; rationale here, research in `openspec/changes/archive/<id>-<slug>/`.
 
 ### Wave 1: Protocol, Lifecycle & Core Templates
 
@@ -44,7 +44,7 @@ Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `sp
 
 | ID | Item | Effort | Depends on | Status | Spec / Feature Dir | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **W3.1** | OpenSpec Integration Review | M | W2.4 | ✅ | `specs/archive/w3.1-openspec-addon/` | Gate 0 Go: Option A (`spec-rails` schema + thin installer); adopt OpenSpec delta specs and `openspec/` layout |
+| **W3.1** | OpenSpec Integration Review | M | W2.4 | ✅ | `openspec/changes/archive/2026-10-30-w3.1-openspec-addon/` | Gate 0 Go: Option A (`spec-rails` schema + thin installer); adopt OpenSpec delta specs and `openspec/` layout |
 | **W3.2** | `spec-rails` OpenSpec Schema & Templates | M | W3.1 | ⬜ | | `research` artifact, gate footers, slice-loop `apply.instruction` |
 | **W3.3** | Gate-to-OpenSpec Mapping | M | W3.2 | ⬜ | | `REQ-*`/`NFR-*` convention in deltas; Gate 6 reduced to rails + `openspec archive` |
 | **W3.4** | Installer CLI | M | W3.2 | ⬜ | | Idempotent POSIX wiring into existing `openspec/` project |
