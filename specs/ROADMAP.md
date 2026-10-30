@@ -44,7 +44,7 @@ Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `sp
 
 | ID | Item | Effort | Depends on | Status | Spec / Feature Dir | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **W3.1** | OpenSpec Integration Review | M | W2.4 | 🚀 | `specs/features/w3.1-openspec-addon/` | Gate 0 Go: Option A (`sdtrd` schema + thin installer); adopt OpenSpec delta specs and `openspec/` layout |
+| **W3.1** | OpenSpec Integration Review | M | W2.4 | ✅ | `specs/archive/w3.1-openspec-addon/` | Gate 0 Go: Option A (`sdtrd` schema + thin installer); adopt OpenSpec delta specs and `openspec/` layout |
 | **W3.2** | `sdtrd` OpenSpec Schema & Templates | M | W3.1 | ⬜ | | `research` artifact, gate footers, slice-loop `apply.instruction` |
 | **W3.3** | Gate-to-OpenSpec Mapping | M | W3.2 | ⬜ | | `REQ-*`/`NFR-*` convention in deltas; Gate 6 reduced to rails + `openspec archive` |
 | **W3.4** | Installer CLI | M | W3.2 | ⬜ | | Idempotent POSIX wiring into existing `openspec/` project |
