@@ -33,7 +33,7 @@ Shared-file protocol (Rule 3.7): both streams touch `Makefile`, `tests/bdd/test_
 ## 3. Vertical Slice Execution Order
 
 ### Slice 1: Schema, Templates & Gate Map (REQ-OSA-1–6, 10; Scenario 4.5)
-- [ ] 1.1 **BDD (Step 5.1-A)**: Scenarios for schema resolution, `research` blocking `proposal`, templates ending in unticked Review Gate.
+- [x] 1.1 **BDD (Step 5.1-A)**: Scenarios for schema resolution, `research` blocking `proposal`, templates ending in unticked Review Gate.
 - [ ] 1.2 **Review Gate 5.1**: Human sign-off on BDD scenarios.
 - [ ] 1.3 **Unit Tests (Red)**: Assert schema DAG/`apply` fields and every template's Review Gate footer; optional `openspec` integration check (`openspec schemas` lists `sdtrd`).
 - [ ] 1.4 **Implementation (Green)**: `schemas/sdtrd/schema.yaml` and `templates/`; gate map documented in the schema. Commit and lock contract.
@@ -72,5 +72,5 @@ Shared-file protocol (Rule 3.7): both streams touch `Makefile`, `tests/bdd/test_
 - [ ] Full test suite passes with ≥ 95% line and branch coverage.
 - [ ] Full mutation checklist re-run on all pure functions (no tool for POSIX `sh`; deviation approved at Gate 3).
 - [ ] Sync spec to `specs/living/openspec-addon/spec.md` and archive with the legacy Gate 6 steps (this feature predates the migration).
-- [ ] **Gate 4 Approval**: Tasks breakdown approved by human before writing test code.
+- [x] **Gate 4 Approval**: Tasks breakdown approved by human before writing test code.
 - [ ] **Gate 6 Approval**: Final sync and archive sign-off.
