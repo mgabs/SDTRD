@@ -51,7 +51,7 @@ Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `sp
 | **W3.5** | Gate Enforcement | M | W3.2, W3.4 | ⬜ | | CI/pre-commit Review Gate and lane checks via `openspec status --json` |
 | **W3.6** | Worktree Streams vs Delta Specs | S | W3.3 | ⬜ | | Rebase + `openspec validate` discipline |
 | **W3.7** | Bugfix Lane & Roadmap Mapping | S | W3.3 | ⬜ | | B1–B3 representation; `ROADMAP.md` vs OpenSpec initiatives |
-| **W3.8** | Self-Migration to Addon Layout | L | W3.2–W3.5 | ⬜ | | `specs/` → `openspec/`; docs, skill, rules, tests |
+| **W3.8** | Self-Migration to Addon Layout | L | W3.2–W3.5 | ✅ | | `specs/` → `openspec/`; docs, skill, rules, tests |
 
 ---
 
