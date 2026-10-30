@@ -1,6 +1,6 @@
-.PHONY: test test-lint test-unit test-bdd bdd lint check-directives
+.PHONY: test test-lint test-unit test-schema test-bdd bdd lint check-directives
 
-test: test-lint test-unit test-bdd
+test: test-lint test-unit test-schema test-bdd
 
 lint: check-directives test-lint
 
@@ -19,6 +19,9 @@ test-lint:
 
 test-unit:
 	@sh tests/test_init.sh
+
+test-schema:
+	@sh tests/test_schema.sh
 
 test-bdd:
 	@sh tests/bdd/test_bdd.sh

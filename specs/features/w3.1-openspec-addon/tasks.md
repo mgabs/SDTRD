@@ -34,10 +34,10 @@ Shared-file protocol (Rule 3.7): both streams touch `Makefile`, `tests/bdd/test_
 
 ### Slice 1: Schema, Templates & Gate Map (REQ-OSA-1–6, 10; Scenario 4.5)
 - [x] 1.1 **BDD (Step 5.1-A)**: Scenarios for schema resolution, `research` blocking `proposal`, templates ending in unticked Review Gate.
-- [ ] 1.2 **Review Gate 5.1**: Human sign-off on BDD scenarios.
-- [ ] 1.3 **Unit Tests (Red)**: Assert schema DAG/`apply` fields and every template's Review Gate footer; optional `openspec` integration check (`openspec schemas` lists `sdtrd`).
-- [ ] 1.4 **Implementation (Green)**: `schemas/sdtrd/schema.yaml` and `templates/`; gate map documented in the schema. Commit and lock contract.
-- [ ] 1.5 **Mutation (manual checklist, per Gate 3)**: Flip each DAG edge/footer expectation and confirm a test fails.
+- [x] 1.2 **Review Gate 5.1**: Human sign-off on BDD scenarios.
+- [x] 1.3 **Unit Tests (Red)**: Assert schema DAG/`apply` fields and every template's Review Gate footer; optional `openspec` integration check (`openspec schemas` lists `sdtrd`).
+- [x] 1.4 **Implementation (Green)**: `schemas/sdtrd/schema.yaml` and `templates/`; gate map documented in the schema. Commit and lock contract.
+- [x] 1.5 **Mutation (manual checklist, per Gate 3)**: Flip each DAG edge/footer expectation and confirm a test fails.
 
 ### Slice 2 [Stream A]: Installer (REQ-OSA-11–15; NFR-OSA-1, 2, 4; Scenarios 4.1–4.4) (`.worktrees/w3.1-installer`)
 - [ ] 2.1 **BDD (Step 5.2-A)**: Scenarios 4.1–4.4 and edge cases 1–3.
