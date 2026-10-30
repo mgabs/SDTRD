@@ -30,10 +30,13 @@ flowchart LR
 - AI agents easily over-engineer or misinterpret informal prompts.
 - Spec-Rails applies the **Ponytail Mindset**: strictly adhere to YAGNI (You Aren't Gonna Need It), eliminating speculative abstractions and unsolicited features.
 - Structured **Human Gates** enforce boundaries before code is written:
+  - **Gate 0 (Research)**: Explores 2–3 options and tradeoffs; the human decides Go or No-Go.
   - **Gate 1 (Proposal)**: Pinpoints intent, measurable success metrics, and strict Out-of-Scope (YAGNI) boundaries.
   - **Gate 2 (Specs)**: Formalizes uniquely keyed requirements (`REQ-*`, `NFR-*`) and Given/When/Then scenarios.
   - **Gate 3 (Design)**: Enforces domain boundaries (Pure Core vs. I/O Shell) and latency/allocation budgets.
   - **Gate 4 (Tasks DAG)**: Maps dependencies and partitions orthogonal tasks into parallel worktree streams.
+  - **Apply (Gate 5.x) and Gate 6**: Per vertical slice, BDD sign-off then Red, Green, coverage, mutation; finally `openspec validate` and `openspec archive`.
+- Drive changes with `openspec new change`, `openspec instructions <artifact>` or the `/opsx-*` commands.
 
 ### 2. Testing Rails: BDD, Red-Green, 100% Mutation Kill
 - Tests are not written after the fact as documentation. They are rails that guide the code.
@@ -65,8 +68,9 @@ spec-rails/
 ├── rules/AGENTS.md           # Always-on agent guardrails
 ├── skills/spec-rails/SKILL.md# Agent skill runbook
 ├── specs/                    # WORKFLOW.md (canonical protocol), ROADMAP.md, bug-reports/
-├── openspec/                 # This repo's own OpenSpec layout (main specs, archived changes)
-├── docs/                     # WAY_OF_WORKING, WIKI, ROADMAP, how-tos/01–05
+├── openspec/                 # This repo's own OpenSpec layout (specs, changes, installed schema and spec-rails/ copies)
+├── .agents/, .github/        # OpenSpec-generated skills, prompts, agent; CI workflows
+├── docs/                     # WAY_OF_WORKING, WIKI, ROADMAP (design note), how-tos/01–05
 ├── tests/                    # installer, check, schema, lint suites + bdd/
 ├── Makefile                  # `make test`
 └── plugin.json               # Agent plugin manifest
@@ -86,7 +90,7 @@ Copies the `spec-rails` schema to `openspec/schemas/spec-rails/`, sets `schema: 
 
 ### Documentation & Guides
 
-- **Engineering Roadmap**: [docs/ROADMAP.md](docs/ROADMAP.md)
+- **Delivery Status**: [specs/ROADMAP.md](specs/ROADMAP.md); **Design Note**: [docs/ROADMAP.md](docs/ROADMAP.md)
 - **Architecture & Methodology Wiki**: [docs/WIKI.md](docs/WIKI.md)
 - **Review Harness & Agent Steering**: [github.com/mgabs/lgtm](https://github.com/mgabs/lgtm)
 - **How-To 1**: [Bootstrap a New Project](docs/how-tos/01-bootstrap-new-project.md)

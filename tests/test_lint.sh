@@ -19,7 +19,7 @@ fail() {
 echo "=== Running Shell Syntax & Spec Sanity Checks ==="
 
 # 1. POSIX shell syntax validation
-for script in "$REPO_ROOT/bin/spec-rails" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/test_schema.sh" "$REPO_ROOT/bin/spec-rails-check" "$REPO_ROOT/tests/test_check.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh"; do
+for script in "$REPO_ROOT/bin/spec-rails" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/test_schema.sh" "$REPO_ROOT/bin/spec-rails-check" "$REPO_ROOT/tests/test_check.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh" "$REPO_ROOT/tests/check_hygiene.sh" "$REPO_ROOT/tests/test_ci_audit.sh" "$REPO_ROOT/tests/test_selfcopy.sh"; do
   if sh -n "$script"; then
     pass "Syntax valid: $(basename "$script")"
   else
@@ -60,6 +60,28 @@ if command -v shellcheck >/dev/null 2>&1; then
 else
   echo "  - ShellCheck not found in PATH (skipped locally, runs in CI)"
 fi
+
+# 5. Docs-link and unused-helper hygiene (REQ-OSA-23, REQ-OSA-24)
+if out="$(sh "$REPO_ROOT/tests/check_hygiene.sh" "$REPO_ROOT")"; then
+  pass "Hygiene: doc links and shell helpers"
+else
+  fail "Hygiene check failed" "$out"
+fi
+
+# Fixtures prove each hygiene rule can fail
+FIX="$(mktemp -d)"
+trap 'rm -rf "$FIX"' EXIT
+mkdir -p "$FIX/docs" "$FIX/bin" "$FIX/tests"
+printf '[x](missing.md)\n' > "$FIX/docs/a.md"
+printf 'cp openspec/schemas/spec-rails/templates/research.md x\n' > "$FIX/docs/b.md"
+printf 'orphan() {\n  :\n}\n' > "$FIX/tests/x.sh"
+fixture_out="$(sh "$REPO_ROOT/tests/check_hygiene.sh" "$FIX" || true)"
+for expected in "docs/a.md -> missing.md" "docs/b.md instructs manual template copy" "tests/x.sh defines unused function orphan"; do
+  case "$fixture_out" in
+    *"$expected"*) pass "Hygiene detects: $expected" ;;
+    *) fail "Hygiene missed: $expected" "$fixture_out" ;;
+  esac
+done
 
 echo ""
 echo "Lint Summary: Passed: $PASSED, Failed: $FAILED"

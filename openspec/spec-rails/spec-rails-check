@@ -17,11 +17,6 @@ gate_state() {
   ' "$1"
 }
 
-# True iff the file's Review Gate section has a ticked box.
-gate_ticked() {
-  [ "$(gate_state "$1")" = ticked ]
-}
-
 gate_number() {
   case "$1" in
     research) echo 0 ;; proposal) echo 1 ;; specs) echo 2 ;;

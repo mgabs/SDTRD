@@ -25,14 +25,6 @@ assert_file() {
   fi
 }
 
-assert_dir() {
-  if [ -d "$1" ]; then
-    step_pass "$2"
-  else
-    step_fail "$2" "Directory '$1' not found"
-  fi
-}
-
 echo "=========================================================="
 echo "Running BDD Acceptance Tests: specs/WORKFLOW.md Lifecycle"
 echo "=========================================================="

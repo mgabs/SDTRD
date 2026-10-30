@@ -38,7 +38,7 @@ your-project/
     └── spec-rails/                     # AGENTS.md, spec-rails-check, bug-report.md, mutation/
 ```
 
-Create `specs/ROADMAP.md` from `templates/roadmap.md` in the spec-rails repo if you want a roadmap.
+Optional: copy `templates/roadmap.md` from the spec-rails repo to `specs/ROADMAP.md` if you track delivery status. Create changes afterwards with `openspec new change <id>-<slug>` (see How-To 2).
 
 ---
 

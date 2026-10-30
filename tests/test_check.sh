@@ -138,7 +138,7 @@ run_check() {
   ERR=$(cat "$WORK/err")
 }
 
-# --- Unit: gate_state / gate_ticked -----------------------------------------
+# --- Unit: gate_state -----------------------------------------
 SPEC_RAILS_SOURCE_ONLY=1
 export SPEC_RAILS_SOURCE_ONLY
 # shellcheck disable=SC1090
@@ -165,19 +165,6 @@ assert_eq unticked "$(gate_state "$U/after.md")" "gate_state ignores box after s
 assert_eq missing "$(gate_state "$U/nobox.md")" "gate_state section without box"
 assert_eq ticked "$(gate_state "$U/mixed.md")" "gate_state any ticked box in section"
 assert_eq missing "$(gate_state "$U/absent.md")" "gate_state missing file"
-
-for f in ticked upper mixed; do
-  if gate_ticked "$U/$f.md"; then PASSED=$((PASSED + 1)); else
-    echo "FAIL: gate_ticked true for $f"
-    FAILED=$((FAILED + 1))
-  fi
-done
-for f in unticked nosection before after nobox absent; do
-  if gate_ticked "$U/$f.md"; then
-    echo "FAIL: gate_ticked false for $f"
-    FAILED=$((FAILED + 1))
-  else PASSED=$((PASSED + 1)); fi
-done
 
 # --- Unit: violations --------------------------------------------------------
 ST='{"artifacts":[{"id":"research","status":"done","requires":[]},{"id":"proposal","status":"done","requires":["research"]},{"id":"specs","status":"done","requires":["proposal"]},{"id":"design","status":"ready","requires":["specs"]}]}'
