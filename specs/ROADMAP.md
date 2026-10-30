@@ -46,11 +46,11 @@ Status Legend (changed only on `main` via `chore/roadmap-<id>` branches; see `sp
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **W3.1** | OpenSpec Integration Review | M | W2.4 | ✅ | `openspec/changes/archive/2026-10-30-w3.1-openspec-addon/` | Gate 0 Go: Option A (`spec-rails` schema + thin installer); adopt OpenSpec delta specs and `openspec/` layout |
 | **W3.2** | `spec-rails` OpenSpec Schema & Templates | M | W3.1 | ✅ | | `research` artifact, gate footers, slice-loop `apply.instruction` |
-| **W3.3** | Gate-to-OpenSpec Mapping | M | W3.2 | ⬜ | | `REQ-*`/`NFR-*` convention in deltas; Gate 6 reduced to rails + `openspec archive` |
+| **W3.3** | Gate-to-OpenSpec Mapping | M | W3.2 | ✅ | `specs/WORKFLOW.md` §7 | `REQ-*`/`NFR-*` convention in deltas; Gate 6 reduced to rails + `openspec archive` |
 | **W3.4** | Installer CLI | M | W3.2 | ✅ | | Idempotent POSIX wiring into existing `openspec/` project |
 | **W3.5** | Gate Enforcement | M | W3.2, W3.4 | ✅ | | CI/pre-commit Review Gate and lane checks via `openspec status --json` |
-| **W3.6** | Worktree Streams vs Delta Specs | S | W3.3 | ⬜ | | Rebase + `openspec validate` discipline |
-| **W3.7** | Bugfix Lane & Roadmap Mapping | S | W3.3 | ⬜ | | B1–B3 representation; `ROADMAP.md` vs OpenSpec initiatives |
+| **W3.6** | Worktree Streams vs Delta Specs | S | W3.3 | ✅ | `specs/WORKFLOW.md` §7 | Rebase + `openspec validate` discipline |
+| **W3.7** | Bugfix Lane & Roadmap Mapping | S | W3.3 | ✅ | `specs/WORKFLOW.md` §7 | B1–B3 representation; `ROADMAP.md` vs OpenSpec initiatives |
 | **W3.8** | Self-Migration to Addon Layout | L | W3.2–W3.5 | ✅ | | `specs/` → `openspec/`; docs, skill, rules, tests |
 
 ---
