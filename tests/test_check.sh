@@ -43,8 +43,8 @@ if [ ! -f "$BIN" ]; then
   exit 1
 fi
 
-# Scratch space lives under the repo (not /tmp) and is removed on exit.
-SCR="$REPO_ROOT/tests/.scratch-check.$$"
+# Scratch space lives outside the repo so no parent git repo leaks into the tests.
+SCR=$(mktemp -d "${TMPDIR:-/tmp}/spec-rails-check.XXXXXX")
 trap 'rm -rf "$SCR"' EXIT INT TERM
 mkdir -p "$SCR/stub"
 
@@ -133,7 +133,7 @@ OUT=""
 ERR=""
 run_check() {
   RC=0
-  (cd "$WORK" && GIT_CEILING_DIRECTORIES="$SCR" PATH="$SCR/stub:$PATH" sh "$BIN" >"$WORK/out" 2>"$WORK/err") || RC=$?
+  (cd "$WORK" && PATH="$SCR/stub:$PATH" sh "$BIN" >"$WORK/out" 2>"$WORK/err") || RC=$?
   OUT=$(cat "$WORK/out")
   ERR=$(cat "$WORK/err")
 }
