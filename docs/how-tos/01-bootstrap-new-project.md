@@ -84,6 +84,17 @@ mutants:
 	mutmut run
 ```
 
+Then point CI at them in `openspec/spec-rails/rails.conf` (created by the installer, never overwritten). `spec-rails-verify` runs these in CI only:
+
+```sh
+RAILS_TEST_DIRS="tests"
+RAILS_TEST="make test"
+RAILS_COVERAGE="make coverage"
+RAILS_MUTATION="make mutants"
+```
+
+It also requires each `REQ-*`/`NFR-*` key of an active change to appear in a test file, and ticked Red/Green/Coverage/Mutation tasks to end with `Evidence: <command and result>`.
+
 ---
 
 ## 4. Commit Baseline

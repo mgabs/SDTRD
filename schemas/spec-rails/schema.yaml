@@ -108,4 +108,5 @@ apply:
     4. Coverage: at least 95% line and branch on the slice's modules.
     5. Mutation: 100% kill score on the slice's modules; fix survivors with an assertion, dead-code deletion, or a restructure.
     Never delete or weaken assertions, skip failing tests, or touch files outside the slice.
+    When ticking a Red, Green, Coverage or Mutation task, end its line with `Evidence: <command and result>`; CI (`spec-rails-verify`) rejects ticked tasks without it.
     Pause if you hit blockers or need clarification.

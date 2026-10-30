@@ -127,6 +127,10 @@ main() {
   done
   put_file "$root/rules/AGENTS.md" "$target/openspec/spec-rails/AGENTS.md"
   put_file "$root/bin/spec-rails-check" "$target/openspec/spec-rails/spec-rails-check"
+  put_file "$root/bin/spec-rails-verify" "$target/openspec/spec-rails/spec-rails-verify"
+  if [ ! -f "$target/openspec/spec-rails/rails.conf" ]; then
+    cp "$root/templates/rails.conf" "$target/openspec/spec-rails/rails.conf"
+  fi
 
   if [ -f "$target/.gitignore" ]; then
     grep -qxF ".worktrees/" "$target/.gitignore" || printf "\n.worktrees/\n" >> "$target/.gitignore"

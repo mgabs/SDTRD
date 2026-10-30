@@ -1,6 +1,6 @@
-.PHONY: test test-lint test-installer test-schema test-check test-ci-audit test-selfcopy test-e2e test-bdd bdd lint check-directives
+.PHONY: test test-lint test-installer test-schema test-check test-ci-audit test-selfcopy test-e2e test-verify test-bdd bdd lint check-directives
 
-test: test-lint test-installer test-schema test-check test-ci-audit test-selfcopy test-e2e test-bdd
+test: test-lint test-installer test-schema test-check test-ci-audit test-selfcopy test-e2e test-verify test-bdd
 
 lint: check-directives test-lint
 
@@ -34,6 +34,9 @@ test-selfcopy:
 
 test-e2e:
 	@sh tests/test_e2e.sh
+
+test-verify:
+	@sh tests/test_verify.sh
 
 test-bdd:
 	@sh tests/bdd/test_bdd.sh

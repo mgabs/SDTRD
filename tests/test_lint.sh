@@ -19,7 +19,7 @@ fail() {
 echo "=== Running Shell Syntax & Spec Sanity Checks ==="
 
 # 1. POSIX shell syntax validation
-for script in "$REPO_ROOT/bin/spec-rails" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/test_schema.sh" "$REPO_ROOT/bin/spec-rails-check" "$REPO_ROOT/tests/test_check.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh" "$REPO_ROOT/tests/check_hygiene.sh" "$REPO_ROOT/tests/test_ci_audit.sh" "$REPO_ROOT/tests/test_selfcopy.sh" "$REPO_ROOT/tests/test_e2e.sh"; do
+for script in "$REPO_ROOT/bin/spec-rails" "$REPO_ROOT/tests/test_installer.sh" "$REPO_ROOT/tests/test_schema.sh" "$REPO_ROOT/bin/spec-rails-check" "$REPO_ROOT/tests/test_check.sh" "$REPO_ROOT/tests/bdd/test_bdd.sh" "$REPO_ROOT/tests/check_hygiene.sh" "$REPO_ROOT/tests/test_ci_audit.sh" "$REPO_ROOT/tests/test_selfcopy.sh" "$REPO_ROOT/tests/test_e2e.sh" "$REPO_ROOT/bin/spec-rails-verify" "$REPO_ROOT/tests/test_verify.sh"; do
   if sh -n "$script"; then
     pass "Syntax valid: $(basename "$script")"
   else

@@ -113,6 +113,8 @@ When a feature contains orthogonal tasks (decoupled modules, distinct endpoints,
 
 Spec-Rails tests itself with the same rails: `make test` includes a fresh-repo end-to-end test (`tests/test_e2e.sh`) that runs the real OpenSpec CLI plus the installer in a throwaway repo and checks that the `spec-rails` schema resolves and the hook blocks an unticked gate. The lint step also fails on broken doc links, manual template-copy instructions and unused shell helpers.
 
+In CI, `spec-rails-verify` (installed to `openspec/spec-rails/`) makes the rails checkable without any language-specific tooling: every `REQ-*`/`NFR-*` in an active change must appear in a test file, ticked Red/Green/Coverage/Mutation tasks must carry `Evidence: <command and result>`, and the `RAILS_TEST`, `RAILS_COVERAGE` and `RAILS_MUTATION` commands in `openspec/spec-rails/rails.conf` must exit 0. It runs only in CI, never as a commit hook.
+
 ### 4.2 Surviving Mutant Protocol
 When a mutant survives:
 1. **Case A: Missing Assertion**: The test suite failed to assert a critical boundary. Fix: Add a targeted assertion.
